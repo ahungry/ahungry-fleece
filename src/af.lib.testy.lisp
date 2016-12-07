@@ -30,14 +30,20 @@
 
 (defmacro desc (desc &rest body)
   "Describe a set of test."
-  `(progn (format t "~a~%" ,desc)
-          ,@body))
+  (format t "~%~a~%~%" desc)
+  `(let (results)
+     (setq results '(,@(loop for it in body collect (eval it))))
+     (format t "~%~a tests, ~a failures~%"
+             (length results)
+             (count nil results))
+     (eq 0 (count nil results))))
 
 (defmacro it (desc &rest body)
   "Assert the body evaluates as expected."
   `(let ((result ,@body))
      (format t "  ~a ~a~%"
              (if result "+" "-")
-             ,desc)))
+             ,desc)
+     result))
 
 ;;; "af.lib.testy" goes here. Hacks and glory await!
