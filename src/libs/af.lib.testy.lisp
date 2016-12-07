@@ -27,22 +27,21 @@
 
 (in-package #:af.lib.testy)
 
-(defmacro desc (desc &rest body)
+(defmacro desc (desc &rest results)
   "Describe a set of test."
-  (format t "~%~a~%~%" desc)
-  `(let (results)
-     (setq results '(,@(loop for it in body collect (eval it))))
+  `(progn
+  (format t "~%~a~%~%" ,desc)
+  (let ((results (list ,@results)))
      (format t "~%~a tests, ~a failures~%"
              (length results)
              (count nil results))
-     (eq 0 (count nil results))))
+     (eq 0 (count nil results)))))
 
-(defmacro it (desc &rest body)
+(defun it (desc result)
   "Assert the body evaluates as expected."
-  `(let ((result ,@body))
-     (format t "  ~a ~a~%"
-             (if result "+" "-")
-             ,desc)
-     result))
+  (format t "  ~a ~a~%"
+          (if result "+" "-")
+          desc)
+  result)
 
 ;;; "af.lib.testy" goes here. Hacks and glory await!

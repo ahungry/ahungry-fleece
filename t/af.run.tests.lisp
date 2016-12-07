@@ -20,6 +20,7 @@
 
 (defpackage af.run.tests
   (:use :cl
+        :af.lib.loggy
         :af.lib.testy)
   (:export :main))
 
@@ -27,6 +28,19 @@
 
 (defun main ()
   "Begin the tests!"
-  (print "YAY"))
+  (desc "af.lib.loggy:"
+
+   (it "Should print to stdout when default level is set"
+       (progn
+       (eq "Hello" (log-> *loggy* 'debug "Hello"))))
+
+   (it "Should not print debug when set to warn"
+       (progn
+       (setf (af.lib.loggy:Level *loggy*) 'warn)
+       (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
+
+   (it "Should break"
+       (eq 2 1))
+   ))
 
 ;;; "af.run.tests" goes here. Hacks and glory await!

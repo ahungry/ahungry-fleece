@@ -32,20 +32,25 @@
   :serial t
   :components
   (
-   ;; The source module
-   (:module "src"
-            :pathname ""
+   ;; The lib modules
+   (:module "libs"
+            :pathname "src/libs"
             :components
-            ((:file "ahungry-fleece" :depends-on ("af.lib.hashy"))
-             (:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
+            ((:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
              (:file "af.lib.testy")
              (:file "af.lib.loggy")))
 
+   ;; The main module
+   (:module "ahungry-fleece"
+            :pathname "src"
+            :depends-on ("libs")
+            :components
+            ((:file "ahungry-fleece")))
+
    ;; The testing module...
    (:module "t"
-            :pathname ""
-            :components
-            :depends-on ("src")
+            :pathname "t"
+            :depends-on ("libs" "ahungry-fleece")
             :components
             ((:file "af.run.tests")))
    )

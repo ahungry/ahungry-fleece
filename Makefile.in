@@ -1,0 +1,18 @@
+LISP?= sbcl
+
+LFLAGS = --disable-debugger --eval '(ql:quickload :ahungry-fleece)' 
+TFLAGS = --disable-debugger --eval '(ql:quickload :ahungry-fleece)' --eval '(af.run.tests:main)' --eval '(quit)'
+EFLAGS = --eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece" :executable t)' 	
+
+EXE = bin/ahungry-fleece
+
+all: $(EXE)
+
+$(EXE): 
+	$(LISP) $(LFLAGS) $(EFLAGS) >/dev/null 2>&1
+
+test: $(EXE)
+	$(EXE) $(TFLAGS)
+
+clean:
+	rm $(EXE)

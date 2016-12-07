@@ -22,6 +22,8 @@
   (:use :cl
         :cl-json)
   (:export
+   :Loggy
+   :Level
    :log->
    :flog
    :*loggy*
