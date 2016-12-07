@@ -14,36 +14,30 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;;;; ahungry-fleece.asd
+;;;; af.lib.testy.lisp
 
-(in-package :cl-user)
+(in-package #:cl-user)
 
-(defpackage ahungry-fleece-asd
-  (:use :cl :asdf))
+(defpackage af.lib.testy
+  (:use :cl
+        :cl-json)
+  (:export
+   :warn
+   :critical
+   :debug))
 
-(in-package :ahungry-fleece-asd)
+(in-package #:af.lib.testy)
 
-(asdf:defsystem #:ahungry-fleece
-  :version "0.0.1"
-  :description "A JSON library."
-  :author "Matthew Carter <m@ahungry.com>"
-  :license "GPLv3"
-  :depends-on (#:cl-json)
-  :serial t
-  :components
-  (
-   ;; The source module
-   (:module "src"
-            :components
-            ((:file "ahungry-fleece" :depends-on ("af.lib.hashy"))
-             (:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
-             (:file "af.lib.loggy")))
-   ;; The testing module...
-   (:module "t"
-            :components
-            ((:module "src")
-             (:file "af.lib.testy")))
-   )
-  )
+(defmacro desc (desc &rest body)
+  "Describe a set of test."
+  `(progn (format t "~a~%" ,desc)
+          ,@body))
 
-;;:in-order-to ((test-op (load-op alluring-allegory-test))))
+(defmacro it (desc &rest body)
+  "Assert the body evaluates as expected."
+  `(let ((result ,@body))
+     (format t "  ~a ~a~%"
+             (if result "+" "-")
+             ,desc)))
+
+;;; "af.lib.testy" goes here. Hacks and glory await!
