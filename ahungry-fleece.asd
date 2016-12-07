@@ -34,15 +34,20 @@
   (
    ;; The source module
    (:module "src"
+            :pathname ""
             :components
             ((:file "ahungry-fleece" :depends-on ("af.lib.hashy"))
              (:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
+             (:file "af.lib.testy")
              (:file "af.lib.loggy")))
+
    ;; The testing module...
    (:module "t"
+            :pathname ""
             :components
-            ((:module "src")
-             (:file "af.lib.testy")))
+            :depends-on ("src")
+            :components
+            ((:file "af.run.tests")))
    )
   )
 

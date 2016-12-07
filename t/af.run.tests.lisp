@@ -14,35 +14,19 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;;; af.lib.testy.lisp
+;;;; af.run.tests.lisp
 
 (in-package #:cl-user)
 
-(defpackage af.lib.testy
+(defpackage af.run.tests
   (:use :cl
-        :cl-json)
-  (:export
-   :desc
-   :it))
+        :af.lib.testy)
+  (:export :main))
 
-(in-package #:af.lib.testy)
+(in-package #:af.run.tests)
 
-(defmacro desc (desc &rest body)
-  "Describe a set of test."
-  (format t "~%~a~%~%" desc)
-  `(let (results)
-     (setq results '(,@(loop for it in body collect (eval it))))
-     (format t "~%~a tests, ~a failures~%"
-             (length results)
-             (count nil results))
-     (eq 0 (count nil results))))
+(defun main ()
+  "Begin the tests!"
+  (print "YAY"))
 
-(defmacro it (desc &rest body)
-  "Assert the body evaluates as expected."
-  `(let ((result ,@body))
-     (format t "  ~a ~a~%"
-             (if result "+" "-")
-             ,desc)
-     result))
-
-;;; "af.lib.testy" goes here. Hacks and glory await!
+;;; "af.run.tests" goes here. Hacks and glory await!

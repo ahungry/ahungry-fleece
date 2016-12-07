@@ -22,9 +22,10 @@
   (:use :cl
         :cl-json)
   (:export
-   :warn
-   :critical
-   :debug))
+   :log->
+   :flog
+   :*loggy*
+   ))
 
 (in-package #:af.lib.loggy)
 
@@ -60,8 +61,12 @@ Sample call:
   (log-> *loggy* 'debug \"Hello World\")"
   (when (>= (get-level (Level logger))
             (get-level level))
-    (funcall (Output logger) message)))
+    (apply (Output logger) message)))
 
 (defparameter *loggy* (make-instance 'Loggy))
+
+(defun flog (level &rest message)
+  "Log to the singleton."
+  (apply #'log-> *loggy* level message))
 
 ;;; "af.lib.loggy" goes here. Hacks and glory await!
