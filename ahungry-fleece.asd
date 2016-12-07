@@ -1,5 +1,5 @@
 ;; Ahungry Fleece - A JSON (and friends) utility library.
-;; Copyright (C) 2016 Matthew Carter
+;; Copyright (C) 2016 Matthew Carter <m@ahungry.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
 ;; it under the terms of the GNU Affero General Public License as published by
@@ -31,10 +31,13 @@
   :depends-on (#:cl-json)
   :serial t
   :components
-  ((:module "src"
+  (
+   (:module "src"
             :components
-            (
-             (:file "ahungry-fleece" :depends-on ("af.lib.hashy"))
+            ((:file "ahungry-fleece" :depends-on ("af.lib.hashy"))
              (:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
-             (:file "af.lib.loggy")
-             ))))
+             (:file "af.lib.loggy")))
+   )
+  )
+
+;;:in-order-to ((test-op (load-op alluring-allegory-test))))
