@@ -31,37 +31,39 @@
 
 (defun main ()
   "Begin the tests!"
-  (suite
-   "af.lib"
+  (if (suite
+       "af.lib"
 
-   (desc
-    "af.lib.loggy"
+       (desc
+        "af.lib.loggy"
 
-    (it "Should send to proper stream when levels are set"
-        (progn
-          (setf (af.lib.loggy:Level *loggy*) 'debug)
-          (setf (af.lib.loggy:Output-Stream *loggy*) nil)
-          (eq "Hello" (log-> *loggy* 'debug "Hello"))))
+        (it "Should send to proper stream when levels are set"
+            (progn
+              (setf (af.lib.loggy:Level *loggy*) 'debug)
+              (setf (af.lib.loggy:Output-Stream *loggy*) nil)
+              (eq "Hello" (log-> *loggy* 'debug "Hello"))))
 
-    (it "Should not print debug when set to warn"
-        (progn
-          (setf (af.lib.loggy:Level *loggy*) 'warn)
-          (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
+        (it "Should not print debug when set to warn"
+            (progn
+              (setf (af.lib.loggy:Level *loggy*) 'warn)
+              (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
 
-    (it "Should break"
-        (eq 2 1))
-    )
+        (it "Should break"
+            (eq 2 1))
+        )
 
-   (desc
-    "af.lib.hashy"
+       (desc
+        "af.lib.hashy"
 
-    (it "Should let me easily access a yml property"
-        (and
-         (setf *yml* (hash-from-yaml-file
-                      (format nil "~a/t/fixtures/pets.yml"
-                              (asdf:system-source-directory :ahungry-fleece))))
-         (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
-    )
-   ))
+        (it "Should let me easily access a yml property"
+            (and
+             (setf *yml* (hash-from-yaml-file
+                          (format nil "~a/t/fixtures/pets.yml"
+                                  (asdf:system-source-directory :ahungry-fleece))))
+             (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
+        )
+       )
+      (sb-ext:exit :code 0)
+      (sb-ext:exit :code 1)))
 
 ;;; "af.run.tests" goes here. Hacks and glory await!

@@ -28,25 +28,26 @@
 
 (in-package #:af.lib.testy)
 
-(defmacro suite (desc &rest results)
-  "Describe a suite of tests."
-  `(progn
-     (format t "~%~a~%" ,desc)
-     (let ((results (list ,@results)))
-       (format t "~%~a tests, ~a failures~%"
-               (length results)
-               (count nil results))
-       (eq 0 (count nil results)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defmacro suite (desc &rest results)
+    "Describe a suite of tests."
+    `(progn
+       (format t "~%~a~%" ,desc)
+       (let ((results (list ,@results)))
+         (format t "~%~a tests, ~a failures~%"
+                 (length results)
+                 (count nil results))
+         (eq 0 (count nil results)))))
 
-(defmacro desc (desc &rest results)
-  "Describe a set of test."
-  `(progn
-     (format t "~%  ~a~%~%" ,desc)
-     (let ((results (list ,@results)))
-       (format t "~%  ~a assertions, ~a failures~%~%"
-               (length results)
-               (count nil results))
-       (eq 0 (count nil results)))))
+  (defmacro desc (desc &rest results)
+    "Describe a set of test."
+    `(progn
+       (format t "~%  ~a~%~%" ,desc)
+       (let ((results (list ,@results)))
+         (format t "~%  ~a assertions, ~a failures~%~%"
+                 (length results)
+                 (count nil results))
+         (eq 0 (count nil results))))))
 
 (defun it (desc result)
   "Assert the body evaluates as expected."
