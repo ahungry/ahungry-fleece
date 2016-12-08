@@ -41,6 +41,15 @@
 
         (it "Should break"
             (eq 2 1))
-        ))
+        )
+
+  (desc "af.lib.hashy"
+        (it "Should decode a json into a hash"
+            (progn
+              (let ((obj (af.lib.hashy:json-to-hash "{\"nums\": [1, 2, 3]}")))
+                (eq (type-of obj) object))))
+        )
+
+  )
 
 ;;; "af.run.tests" goes here. Hacks and glory await!

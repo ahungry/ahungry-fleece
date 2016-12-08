@@ -21,12 +21,14 @@
 (defpackage af.lib.hashy
   (:use :cl
         :cl-json)
-  (:export :main))
+  (:export
+   :json-to-hash
+   ))
 
 (in-package #:af.lib.hashy)
 
-(defun json-string-to-hash (json)
+(defun json-to-hash (json)
   "Convert a json string into a hash table."
-  )
+  json)
 
 ;;; "af.lib.hashy" goes here. Hacks and glory await!

@@ -30,12 +30,12 @@
 (defmacro desc (desc &rest results)
   "Describe a set of test."
   `(progn
-  (format t "~%~a~%~%" ,desc)
-  (let ((results (list ,@results)))
-     (format t "~%~a tests, ~a failures~%"
-             (length results)
-             (count nil results))
-     (eq 0 (count nil results)))))
+     (format t "~%~a~%~%" ,desc)
+     (let ((results (list ,@results)))
+       (format t "~%~a tests, ~a failures~%"
+               (length results)
+               (count nil results))
+       (eq 0 (count nil results)))))
 
 (defun it (desc result)
   "Assert the body evaluates as expected."
