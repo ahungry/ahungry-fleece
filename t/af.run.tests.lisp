@@ -52,8 +52,8 @@
 
    (it "Should let me easily access a yml property"
        (and
-        (setf *yml* (hash-from-yaml-file "t/fixtures/pet.yml"))
-        (eq "object" (ref "#/definitions/Pet/type" *yml*))))
+        (setf *yml* (af.lib.hashy:hash-from-yaml-file "fixtures/pets.yml"))
+        (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
    )
 
   )

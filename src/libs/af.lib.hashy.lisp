@@ -27,6 +27,7 @@
         :af.lib.io)
   (:export
    :json-to-hash
+   :hash-from-yaml-file
    :ref
    ))
 

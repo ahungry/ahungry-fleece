@@ -15,4 +15,4 @@ test: $(EXE)
 	$(EXE) $(TFLAGS)
 
 clean:
-	rm $(EXE)
+	-rm $(EXE)

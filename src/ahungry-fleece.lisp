@@ -22,12 +22,12 @@
   (:use :cl
         :cl-json
         :af.lib.hashy)
-  (:export :version))
+  (:export :main))
 
 (in-package #:ahungry-fleece)
 
-(defun version ()
+(defun main ()
   "Well...guess we can print the version here."
-  (print "0.0.1"))
+  (print "0.0.2"))
 
 ;;; "ahungry-fleece" goes here. Hacks and glory await!
