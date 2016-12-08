@@ -23,6 +23,7 @@
         :cl-json
         :cl-yaml
         :split-sequence
+        :af.lib.loggy
         :af.lib.io)
   (:export
    :json-to-hash
@@ -58,20 +59,26 @@ as such:
   (ref \"#/definitions/Pet/name\" obj)
 
 Will return the setf'able value \"Fido\"."
-  (let ((args (split-sequence:split-sequence #\/ path)))
-    (reduce (lambda (acc arg)
-              (cond
-                ;; When it's a hash table, get the hash or skip if missing.
-                ((hash-table-p acc)
-                 (or (gethash arg acc) acc))
+  (let ((args (cdr (split-sequence:split-sequence #\/ path)))
+        (chain '("#")))
+    (reduce
+     (lambda (acc arg)
+       (push arg chain)
+       (cond
+         ;; If we failed to get a node, keep returning nil.
+         ((eq nil acc)
+          (flog 'warn
+                (format nil "#'ref missed node: ~{~a~^/~}" (reverse chain)))
+          nil)
 
-                ;; When it's a list, grab the nth value or skip if missing.
-                ((listp acc)
-                 (or (nth (parse-integer arg :junk-allowed t) acc) acc))
+         ;; When it's a hash table, get via hash.
+         ((hash-table-p acc) (gethash arg acc))
 
-                ;; When it is neither, just return accumulator, we are
-                ;; very generous about accepting poor paths/data...
-                (t acc)))
-            (push object args))))
+         ;; When it's a list, grab the nth value.
+         ((listp acc) (nth (parse-integer arg :junk-allowed t) acc))
+
+         ;; Return nothing if nothing was found.
+         (t nil)))
+     (push object args))))
 
 ;;; "af.lib.hashy" goes here. Hacks and glory await!
