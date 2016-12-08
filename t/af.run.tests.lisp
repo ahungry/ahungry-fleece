@@ -32,10 +32,11 @@
 (defun main ()
   "Begin the tests!"
   (desc
-   "af.lib.loggy:"
+   "af.lib.loggy"
 
    (it "Should print to stdout when default level is set"
        (progn
+         (setf (af.lib.loggy:Level *loggy*) 'debug)
          (eq "Hello" (log-> *loggy* 'debug "Hello"))))
 
    (it "Should not print debug when set to warn"
@@ -52,7 +53,9 @@
 
    (it "Should let me easily access a yml property"
        (and
-        (setf *yml* (af.lib.hashy:hash-from-yaml-file "fixtures/pets.yml"))
+        (setf *yml* (hash-from-yaml-file
+                     (format nil "~a/t/fixtures/pets.yml"
+                             (asdf:system-source-directory :ahungry-fleece))))
         (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
    )
 

@@ -32,15 +32,18 @@
 (in-package #:af.lib.loggy)
 
 (defclass Loggy ()
-  (
-   (Level
+  ((Level
     :accessor Level
     :initarg :level
     :initform 'debug)
    (Output
     :accessor Output
     :initarg :output
-    :initform 'print)
+    :initform 'format)
+   (Output-Stream
+    :accessor Output-Stream
+    :initarg :output-stream
+    :initform t)
    ))
 
 (defun get-level (level)
@@ -63,7 +66,7 @@ Sample call:
   (log-> *loggy* 'debug \"Hello World\")"
   (when (>= (get-level (Level logger))
             (get-level level))
-    (apply (Output logger) message)))
+    (apply (Output logger) (Output-Stream logger) message)))
 
 (defparameter *loggy* (make-instance 'Loggy))
 
