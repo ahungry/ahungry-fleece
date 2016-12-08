@@ -40,7 +40,10 @@
   "Read in FILENAME and create a hash."
   (yaml:parse (file-get-contents filename)))
 
-;; @todo Make this work
+(defun dump (object)
+  "Return the object as json."
+  (yaml:emit-to-string object))
+
 (defun ref (path object)
   "Query a reference to a JSON or YML object.
 

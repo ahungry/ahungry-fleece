@@ -29,7 +29,8 @@
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
   :depends-on (#:cl-json
-               #:cl-yaml)
+               #:cl-yaml
+               #:split-sequence)
   :serial t
   :components
   (

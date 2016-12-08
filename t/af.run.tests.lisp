@@ -21,10 +21,13 @@
 (defpackage af.run.tests
   (:use :cl
         :af.lib.loggy
+        :af.lib.hashy
         :af.lib.testy)
   (:export :main))
 
 (in-package #:af.run.tests)
+
+(defparameter *yml* nil "The yml file for testing.")
 
 (defun main ()
   "Begin the tests!"
@@ -48,7 +51,9 @@
    "af.lib.hashy"
 
    (it "Should let me easily access a yml property"
-       (eq "Fido" (ref nil "#/definitions/Pet/name")))
+       (and
+        (setf *yml* (hash-from-yaml-file "t/fixtures/pet.yml"))
+        (eq "object" (ref "#/definitions/Pet/type" *yml*))))
    )
 
   )
