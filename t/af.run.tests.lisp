@@ -31,34 +31,37 @@
 
 (defun main ()
   "Begin the tests!"
-  (desc
-   "af.lib.loggy"
+  (suite
+   "af.lib"
 
-   (it "Should print to stdout when default level is set"
-       (progn
-         (setf (af.lib.loggy:Level *loggy*) 'debug)
-         (eq "Hello" (log-> *loggy* 'debug "Hello"))))
+   (desc
+    "af.lib.loggy"
 
-   (it "Should not print debug when set to warn"
-       (progn
-         (setf (af.lib.loggy:Level *loggy*) 'warn)
-         (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
+    (it "Should send to proper stream when levels are set"
+        (progn
+          (setf (af.lib.loggy:Level *loggy*) 'debug)
+          (setf (af.lib.loggy:Output-Stream *loggy*) nil)
+          (eq "Hello" (log-> *loggy* 'debug "Hello"))))
 
-   (it "Should break"
-       (eq 2 1))
-   )
+    (it "Should not print debug when set to warn"
+        (progn
+          (setf (af.lib.loggy:Level *loggy*) 'warn)
+          (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
 
-  (desc
-   "af.lib.hashy"
+    (it "Should break"
+        (eq 2 1))
+    )
 
-   (it "Should let me easily access a yml property"
-       (and
-        (setf *yml* (hash-from-yaml-file
-                     (format nil "~a/t/fixtures/pets.yml"
-                             (asdf:system-source-directory :ahungry-fleece))))
-        (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
-   )
+   (desc
+    "af.lib.hashy"
 
-  )
+    (it "Should let me easily access a yml property"
+        (and
+         (setf *yml* (hash-from-yaml-file
+                      (format nil "~a/t/fixtures/pets.yml"
+                              (asdf:system-source-directory :ahungry-fleece))))
+         (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
+    )
+   ))
 
 ;;; "af.run.tests" goes here. Hacks and glory await!

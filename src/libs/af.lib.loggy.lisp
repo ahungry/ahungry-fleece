@@ -24,6 +24,9 @@
   (:export
    :Loggy
    :Level
+   :Output
+   :Output-Args
+   :Output-Stream
    :log->
    :flog
    :*loggy*
@@ -40,6 +43,10 @@
     :accessor Output
     :initarg :output
     :initform 'format)
+   (Output-Args
+    :accessor Output-Args
+    :initarg :output-args
+    :initform '("~a~%"))
    (Output-Stream
     :accessor Output-Stream
     :initarg :output-stream
@@ -66,7 +73,9 @@ Sample call:
   (log-> *loggy* 'debug \"Hello World\")"
   (when (>= (get-level (Level logger))
             (get-level level))
-    (apply (Output logger) (Output-Stream logger) message)))
+    (apply (Output logger) (Output-Stream logger)
+           (append (Output-Args logger) message))
+    (car message)))
 
 (defparameter *loggy* (make-instance 'Loggy))
 
