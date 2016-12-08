@@ -28,7 +28,8 @@
   :description "A JSON library."
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
-  :depends-on (#:cl-json)
+  :depends-on (#:cl-json
+               #:cl-yaml)
   :serial t
   :components
   (
@@ -36,9 +37,13 @@
    (:module "libs"
             :pathname "src/libs"
             :components
-            ((:file "af.lib.hashy" :depends-on ("af.lib.loggy"))
+            ((:file "af.lib.hashy"
+                    :depends-on ("af.lib.loggy"
+                                 "af.lib.io"))
              (:file "af.lib.testy")
-             (:file "af.lib.loggy")))
+             (:file "af.lib.loggy"
+                    :depends-on ("af.lib.io"))
+             (:file "af.lib.io")))
 
    ;; The main module
    (:module "ahungry-fleece"
@@ -47,7 +52,7 @@
             :components
             ((:file "ahungry-fleece")))
 
-   ;; The testing module...
+   ;; The testing module (@todo Look at Injection for separate asd for testing)...
    (:module "t"
             :pathname "t"
             :depends-on ("libs" "ahungry-fleece")

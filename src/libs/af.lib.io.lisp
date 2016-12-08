@@ -14,43 +14,30 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;;; af.run.tests.lisp
+;;;; af.lib.io.lisp
 
 (in-package #:cl-user)
 
-(defpackage af.run.tests
+(defpackage af.lib.io
   (:use :cl
-        :af.lib.loggy
-        :af.lib.testy)
-  (:export :main))
+        :cl-json)
+  (:export
+   :file-get-contents
+   ))
 
-(in-package #:af.run.tests)
+(in-package #:af.lib.io)
 
-(defun main ()
-  "Begin the tests!"
-  (desc
-   "af.lib.loggy:"
+(defun file-get-contents (filename)
+  "Read in FILENAME and return as a single string."
+  (let ((lines
+         (with-open-file
+             (stream filename
+                     :direction :input
+                     :if-does-not-exist :error)
+           (when stream
+             (loop for line = (read-line stream nil 'eof)
+                until (eq line 'eof)
+                collect line)))))
+    (format nil "~{~a~%~}" lines)))
 
-   (it "Should print to stdout when default level is set"
-       (progn
-         (eq "Hello" (log-> *loggy* 'debug "Hello"))))
-
-   (it "Should not print debug when set to warn"
-       (progn
-         (setf (af.lib.loggy:Level *loggy*) 'warn)
-         (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
-
-   (it "Should break"
-       (eq 2 1))
-   )
-
-  (desc
-   "af.lib.hashy"
-
-   (it "Should let me easily access a yml property"
-       (eq "Fido" (ref nil "#/definitions/Pet/name")))
-   )
-
-  )
-
-;;; "af.run.tests" goes here. Hacks and glory await!
+;;; "af.lib.io" goes here. Hacks and glory await!
