@@ -34,17 +34,47 @@
 
 (in-package #:af.lib.hashy)
 
+(defun dotp (pair)
+  "T if PAIR is a dotted pair and not a list."
+  (not (listp (cdr pair))))
+
 (defun alist-to-hash (alist)
   "Convert ALIST into a nested hash."
   (let ((hash (make-hash-table :test #'equal)))
-    ;; Convert each item in the alist to a hash key
-    (loop for item in alist
-       do (let ((key (string-downcase (string (car item))))
-                (item (cdr item)))
-            (if (listp item)
-                (setf (gethash key hash) (alist-to-hash item))
-                (setf (gethash key hash) item))))
-    hash))
+    (cond
+      ;; We receive something like '(:this . "that")
+      ((dotp alist)
+       (setf (gethash (string-downcase (string (car alist))) hash)
+             (cdr alist)))
+
+      ;; We receive something like '(1 2 3)
+      ((not (listp (car alist)))
+       alist)
+
+      ;; We receive something like '((:list . "ofStuff"))
+      ((listp (car (car alist)))
+       (mapcar (lambda (item)
+                 (alist-to-hash item))
+               alist)
+       )
+
+      ;; We receive something like '(:here . ((:we . "go")))
+      ;; Convert each item in the alist to a hash key
+      (t
+       (loop for item in alist
+          do (if
+              (listp (car item))
+              (progn
+                (print "WTF")
+                (list (alist-to-hash item))
+                ;;(setf (gethash "??" hash) (alist-to-hash item))
+                )
+              (let ((key (string-downcase (string (car item))))
+                   (item (cdr item)))
+               (if (listp item) ;; We know it isn't an atom
+                   (setf (gethash key hash) (alist-to-hash item))
+                   (setf (gethash key hash) item)))))
+       hash))))
 
 (defun alist-from-json-file (filename)
   "Read in FILENAME and create an alist."

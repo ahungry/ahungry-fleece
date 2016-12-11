@@ -48,7 +48,7 @@
               (setf (af.lib.loggy:Level *loggy*) 'warn)
               (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
 
-        (it "Should break"
+        (it "Should break (this is intentional failure)"
             (eq 2 1))
         )
 
