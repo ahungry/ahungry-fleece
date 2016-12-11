@@ -48,8 +48,6 @@
               (setf (af.lib.loggy:Level *loggy*) 'warn)
               (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
 
-        (it "Should break (this is intentional failure)"
-            (eq 2 1))
         )
 
        (desc
@@ -66,6 +64,22 @@
             (equal 1 (ref "#/one/ione"
                           (alist-to-hash
                            '((:one . ((:ione . 1))) (:two . 2))))))
+
+        (it "Should undo cl-json key mangling"
+            (equal "DogTime" (stringify :*dog-time)))
+
+        (it "Should return same results from yaml or json"
+            (let* ((fpath (format nil "~a/t/fixtures/"
+                                  (asdf:system-source-directory :ahungry-fleece)))
+                   (yamlobj (hash-from-yaml-file (format nil "~a~a"
+                                                         fpath
+                                                         "pets.yml")))
+                   (jsonobj (hash-from-json-file (format nil "~a~a"
+                                                         fpath
+                                                         "pets.json"))))
+              (equal (dump yamlobj)
+                     (dump jsonobj))))
+
         )
 
        ) ;; end suite

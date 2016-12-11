@@ -27,9 +27,12 @@
         :af.lib.io)
   (:export
    :alist-to-hash
+   :dump
    :hash-from-json-file
    :hash-from-yaml-file
    :ref
+   :stringify
+   :dotp
    ))
 
 (in-package #:af.lib.hashy)
