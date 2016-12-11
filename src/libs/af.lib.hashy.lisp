@@ -26,16 +26,35 @@
         :af.lib.loggy
         :af.lib.io)
   (:export
-   :json-to-hash
+   :hash-from-json-file
    :hash-from-yaml-file
    :ref
    ))
 
 (in-package #:af.lib.hashy)
 
-(defun json-to-hash (json)
-  "Convert a json string into a hash table."
-  json)
+(defun alist-to-hash (alist)
+  "Convert ALIST into a nested hash."
+  (let ((hash (make-hash-table :test #'equal)))
+    ;; Convert each item in the alist to a hash key
+    (loop for item in alist
+       do (let ((key (string-downcase (string (car item))))
+                (item (cdr item)))
+            (if (listp item)
+                (setf (gethash key hash) (alist-to-hash item))
+                (setf (gethash key hash) item))))
+    hash))
+
+(defun alist-from-json-file (filename)
+  "Read in FILENAME and create an alist."
+  (let ((json (cl-json:decode-json-from-string
+               (file-get-contents filename))))
+    json))
+
+(defun hash-from-json-file (filename)
+  "Read in FILENAME and create a hash."
+  (let ((json (alist-from-json-file filename)))
+    (alist-to-hash json)))
 
 (defun hash-from-yaml-file (filename)
   "Read in FILENAME and create a hash."
