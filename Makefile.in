@@ -1,18 +1,30 @@
 LISP?= sbcl
 
-LFLAGS = --disable-debugger --eval '(ql:quickload :ahungry-fleece)'
-TFLAGS = --disable-debugger --eval '(ql:quickload :ahungry-fleece)' --eval '(af.run.tests:main)' --eval '(quit)'
-EFLAGS = --eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece" :executable t :compression t)'
+TFLAGS = --non-interactive \
+	--eval '(ql:quickload :ahungry-fleece)' \
+	--eval '(af.run.tests:main)'
 
+CFLAGS = --disable-debugger \
+	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece.core")'
+
+EFLAGS = --disable-debugger \
+	--eval '(ql:quickload :ahungry-fleece)' \
+	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece" :executable t)'
+
+CORE = bin/ahungry-fleece.core
 EXE = bin/ahungry-fleece
 
 all: $(EXE)
 
-$(EXE):
-	$(LISP) $(LFLAGS) $(EFLAGS) >/dev/null
+$(CORE):
+	$(LISP) $(CFLAGS)
+
+$(EXE): $(CORE)
+	$(LISP) --core $< $(EFLAGS)
 
 test: $(EXE)
-	$(EXE) $(TFLAGS)
+	$< $(TFLAGS)
 
 clean:
+	-rm $(CORE)
 	-rm $(EXE)
