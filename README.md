@@ -1,6 +1,6 @@
 # Ahungry Fleece
 
-## A JSON (and friends) utility library
+## A minimalist utility library for Common Lisp
 
 In Greek mythology, the Golden Fleece (Greek: χρυσόμαλλον δέρας
 chrysómallon déras) is the fleece of the gold-hair winged ram,
@@ -12,10 +12,10 @@ rapid development in one of the greatest languages around (Lisp!)
 
 # Usage
 
-## YAML/JSON ref selection
+## YAML/JSON/HASH-TABLE ref selection
 
-There is a way to quickly select a node in some given YML or JSON as
-such:
+There is a way to quickly select a node in some given YML or JSON or
+HASH-TABLE as such:
 
 ```yml
 definitions:
