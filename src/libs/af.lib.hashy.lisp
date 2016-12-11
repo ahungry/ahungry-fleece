@@ -38,27 +38,11 @@
 (in-package #:af.lib.hashy)
 
 (defun stringify (symbol)
-  "Turn a cl-json converted string from the symbol back
-into the appropriate string.
-
-This primarily changes things like *this to This and one-two to oneTwo.
-
-We will probably have an issue in the future when there is a legitimate
-dash in a key name..."
-  (let ((string (string-downcase (string symbol)))
-        (last))
-    (remove-if
-     (lambda (c) (or (eq #\* c) (eq #\- c))) ;; Remove * chars
-     (map 'string
-          (lambda (c)
-            (let (char)
-              (cond
-                ((eq last #\*) (setf char (char (string-upcase c) 0)))
-                ((eq last #\-) (setf char (char (string-upcase c) 0)))
-                (t (setf char c)))
-              (setf last c)
-              char))
-          string))))
+  "Convert a cl-json symbol back into original representation."
+  (let* ((decoded (cl-json:encode-json-to-string `((,symbol . ""))))
+         (start-pos 2) ;; after the {"
+         (end-pos (position #\" (subseq decoded start-pos))))
+    (subseq decoded start-pos (+ start-pos end-pos))))
 
 (defun dotp (pair)
   "T if PAIR is a dotted pair and not a list."
