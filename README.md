@@ -33,17 +33,13 @@ element of the required array as such:
 (use-package :af.lib.hashy)
 (defparameter *yml* (hash-from-yaml-file "pets.yml"))
 (ref "#/definitions/Pet/required/0" *yml*) ;; returns "name"
+
+;; To set the value (changing 'object' to 'array')
+(ref "#/definitions/Pet/type" *yml* "array")
 ```
 
-### TODO
-
-For the ref selection, will allow the following to work soon (assume
-the above code has already been run):
-
-```lisp
-(setf (ref "#/definitions/Pet/required/0" *yml*) "age")
-(ref "#/definitions/Pet/required/0" *yml*) ;; returns "age"
-```
+The above would also work with json (just use the
+`#'hash-from-json-file` call instead).
 
 # License
 
