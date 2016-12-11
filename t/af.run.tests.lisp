@@ -89,10 +89,12 @@
                (equal 42 (gethash "findme" (gethash "hash2" hash1)))
                (progn
                  (setf (gethash "findme" hash2) 33)
-                 (print (dump hash1))
                  (equal 33 (gethash "findme" (gethash "hash2" hash1)))
                  )
                (equal 33 (ref "#/hash2/findme" hash1))
+               (progn
+                 (ref "#/hash2/findme" hash1 99)
+                 (equal 99 (ref "#/hash2/findme" hash1)))
                t)
               ))
         )

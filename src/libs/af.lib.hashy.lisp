@@ -138,10 +138,12 @@ as such:
 
 Will return the setf'able value \"Fido\"."
   (let ((args (cdr (split-sequence:split-sequence #\/ path)))
-        (chain '("#")))
+        (chain '("#"))
+        (iter 0))
     (reduce
      (lambda (acc arg)
        (push arg chain)
+       (incf iter)
        (cond
          ;; If we failed to get a node, keep returning nil.
          ((eq nil acc)
@@ -150,7 +152,10 @@ Will return the setf'able value \"Fido\"."
           nil)
 
          ;; When it's a hash table, get via hash.
-         ((hash-table-p acc) (gethash arg acc))
+         ((hash-table-p acc)
+          (when (and value (eq (1+ iter) (length args)))
+            (setf (gethash arg acc) value))
+          (gethash arg acc))
 
          ;; When it's a list, grab the nth value.
          ((listp acc) (nth (parse-integer arg :junk-allowed t) acc))
