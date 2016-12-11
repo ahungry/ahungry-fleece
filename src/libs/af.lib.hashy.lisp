@@ -26,6 +26,7 @@
         :af.lib.loggy
         :af.lib.io)
   (:export
+   :alist-to-hash
    :hash-from-json-file
    :hash-from-yaml-file
    :ref

@@ -61,8 +61,14 @@
                           (format nil "~a/t/fixtures/pets.yml"
                                   (asdf:system-source-directory :ahungry-fleece))))
              (equal "object" (af.lib.hashy:ref "#/definitions/Pet/type" *yml*))))
+
+        (it "Should parse alist to hash properly"
+            (equal 1 (ref "#/one/ione"
+                          (alist-to-hash
+                           '((:one . ((:ione . 1))) (:two . 2))))))
         )
-       )
+
+       ) ;; end suite
       (sb-ext:exit :code 0)
       (sb-ext:exit :code 1)))
 
