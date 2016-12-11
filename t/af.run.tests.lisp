@@ -80,6 +80,21 @@
               (equal (dump yamlobj)
                      (dump jsonobj))))
 
+        (it "Should allow setting of nested hash tables"
+            (let ((hash1 (make-hash-table :test #'equal))
+                  (hash2 (make-hash-table :test #'equal)))
+              (setf (gethash "findme" hash2) 42)
+              (setf (gethash "hash2" hash1) hash2)
+              (and
+               (equal 42 (gethash "findme" (gethash "hash2" hash1)))
+               (progn
+                 (setf (gethash "findme" hash2) 33)
+                 (print (dump hash1))
+                 (equal 33 (gethash "findme" (gethash "hash2" hash1)))
+                 )
+               (equal 33 (ref "#/hash2/findme" hash1))
+               t)
+              ))
         )
 
        ) ;; end suite

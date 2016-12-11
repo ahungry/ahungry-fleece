@@ -113,8 +113,14 @@ dash in a key name..."
   "Return the object as json."
   (yaml:emit-to-string object))
 
-(defun ref (path object)
-  "Query a reference to a JSON or YML object.
+(defun ref (path object &optional value)
+  "Query a reference to a json or yaml object.
+
+PATH is a path such as #/key/anotherKey/anotherKey/node.
+
+OBJECT is a hash table (optionally made up of nested ones or lists).
+
+VALUE is an optional value to change the node to.
 
 For example, calling on a JSON object like:
 
