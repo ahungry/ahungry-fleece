@@ -54,7 +54,7 @@ definitions:
 ```
 
 You can get the first element of the 'required' array as such (assume
-that YAML above is in a file named 'pets.yml':
+that YAML above is in a file named 'pets.yml'):
 
 ```lisp
 (use-package :af.lib.hashy)
