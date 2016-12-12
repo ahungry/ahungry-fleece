@@ -47,7 +47,6 @@
             (progn
               (setf (af.lib.loggy:Level *loggy*) 'warn)
               (not (eq "Hello" (log-> *loggy* 'debug "Hello")))))
-
         )
 
        (desc

@@ -1,7 +1,6 @@
 # Ahungry Fleece
 
 ## A minimalist utility library for Common Lisp
-
 In Greek mythology, the Golden Fleece (Greek: χρυσόμαλλον δέρας
 chrysómallon déras) is the fleece of the gold-hair winged ram,
 which was held in Colchis. The fleece is a symbol of authority and
@@ -10,12 +9,39 @@ kingship. It figures in the tale of the hero Jason...
 In my mythology, the Ahungry Fleece simplifies the programmer's job of
 rapid development in one of the greatest languages around (Lisp!)
 
+## TOC
+- [Setup](#setup)
+  * [Install](#installation)
+- [Usage](#usage)
+  * [RefPath (fast YAML/JSON/HASH selection)](#refpath)
+  * [Logging](#logging)
+- [About](#about)
+  * [Maintainer](#maintainer)
+  * [License](#license)
+
+# Setup
+## Installation
+Currently the library is not on quicklisp (yet), so you'll have to add
+to your local proejcts directory after cloning it, as such:
+
+```sh
+cd ~/some/path
+git clone https://github.com/ahungry/ahungry-fleece
+```
+
+```lisp
+(push #P"~/some/path/ahungry-fleece" ql:*local-project-directories*)
+(ql:quickload :ahungry-fleece)
+;; Optionally confirm all is working by running the tests
+(af.lib.test:main)
+```
+
 # Usage
+## RefPath
+There is a way to quickly select a node in some given YAML or JSON or
+HASH-TABLE.
 
-## YAML/JSON/HASH-TABLE ref selection
-
-There is a way to quickly select a node in some given YML or JSON or
-HASH-TABLE as such:
+When given some YAML such as this (for example):
 
 ```yml
 definitions:
@@ -26,8 +52,8 @@ definitions:
     - petType
 ```
 
-Say you have that in a file such as pets.yml, you can get the first
-element of the required array as such:
+You can get the first element of the 'required' array as such (assume
+that YAML above is in a file named 'pets.yml':
 
 ```lisp
 (use-package :af.lib.hashy)
@@ -41,6 +67,36 @@ element of the required array as such:
 The above would also work with json (just use the
 `#'hash-from-json-file` call instead).
 
-# License
+## Logging
+There is also support for a small and easy to use logging interface.
 
+To log using the `*loggy*` singleton instance of the Loggy class, you
+can simply:
+
+```lisp
+(use-package :af.lib.loggy)
+
+;; Will print only if log level is set to 'debug' (default)
+(flog 'debug "Hello world")
+
+;; If you want to suppress those calls in the code on a prod instance
+(setf (Level *loggy*) 'warn)
+
+;; Will now no longer print at all (using a specific log call, but to
+singleton again, so equivalent to the #'flog call):
+(log-> *loggy* 'debug "Hello world")
+```
+
+You can customize the following properties in the Loggy class:
+- Level (can use 'debug, 'warn, 'info, 'crit): controls when to invoke
+  log output
+- Output (default #'format): function called for outputting
+- Output-Args (default '("~a~%")): Extra arguments passed to Output
+- Output-Stream (default t): The stream target (primarily for format output)
+
+# About
+## Maintainer
+You can reach me at Matthew Carter <m@ahungry.com> or file an issue here.
+
+## License
 GPLv3
