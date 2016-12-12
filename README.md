@@ -15,6 +15,7 @@ rapid development in one of the greatest languages around (Lisp!)
 - [Usage](#usage)
   * [RefPath (fast YAML/JSON/HASH selection)](#refpath)
   * [Logging](#logging)
+  * [Testing](#testing)
 - [About](#about)
   * [Maintainer](#maintainer)
   * [License](#license)
@@ -76,14 +77,14 @@ can simply:
 ```lisp
 (use-package :af.lib.loggy)
 
-;; Will print only if log level is set to 'debug' (default)
+;; Will print only if log level is set to 'debug (default)
 (flog 'debug "Hello world")
 
 ;; If you want to suppress those calls in the code on a prod instance
 (setf (Level *loggy*) 'warn)
 
 ;; Will now no longer print at all (using a specific log call, but to
-singleton again, so equivalent to the #'flog call):
+;; singleton again, so equivalent to the #'flog call):
 (log-> *loggy* 'debug "Hello world")
 ```
 
@@ -93,6 +94,36 @@ You can customize the following properties in the Loggy class:
 - Output (default #'format): function called for outputting
 - Output-Args (default '("~a~%")): Extra arguments passed to Output
 - Output-Stream (default t): The stream target (primarily for format output)
+
+## Testing
+A tiny BDD test framework exists, and can be used as such:
+
+```lisp
+(use-package :af.lib.testy)
+(suite "your.suite"
+  (desc "your.suite.function"
+    (it "Should add two numbers"
+      (and
+        (eq 4 (+ 2 2))
+        (eq 8 (+ 6 2))))
+
+    (it "Should fail here"
+      (eq 10 (+ 2 2)))))
+```
+which will produce some output such as this when run:
+
+```
+your.suite
+
+  your.suite.function
+
+    + Should add two numbers
+    - Should fail here
+
+  2 assertions, 1 failures
+
+1 tests, 1 failures
+```
 
 # About
 ## Maintainer
