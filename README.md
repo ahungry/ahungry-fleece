@@ -60,7 +60,11 @@ that YAML above is in a file named 'pets.yml':
 (use-package :af.lib.hashy)
 (defparameter *yml* (hash-from-yaml-file "pets.yml"))
 (ref "#/definitions/Pet/required/0" *yml*) ;; returns "name"
+```
 
+You can also set values by passing in the optional third parameter:
+
+```lisp
 ;; To set the value (changing 'object' to 'array')
 (ref "#/definitions/Pet/type" *yml* "array")
 ```
