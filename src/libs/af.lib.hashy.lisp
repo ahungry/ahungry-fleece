@@ -29,10 +29,13 @@
    :alist-to-hash
    :dump
    :hash-from-json-file
+   :hash-from-json-string
    :hash-from-yaml-file
+   :hash-from-yaml-string
    :ref
    :stringify
    :dotp
+   :with-hashy
    ))
 
 (in-package #:af.lib.hashy)
@@ -78,20 +81,58 @@
                    (setf (gethash key hash) item))))
        hash))))
 
-(defun alist-from-json-file (filename)
-  "Read in FILENAME and create an alist."
-  (let ((json (cl-json:decode-json-from-string
-               (file-get-contents filename))))
-    json))
+(defun hash-from-json-string (json-string)
+  "Create a hash from the JSON-STRING."
+  (alist-to-hash (cl-json:decode-json-from-string json-string)))
 
 (defun hash-from-json-file (filename)
   "Read in FILENAME and create a hash."
-  (let ((json (alist-from-json-file filename)))
-    (alist-to-hash json)))
+  (hash-from-json-string (file-get-contents filename)))
+
+(defun hash-from-yaml-string (yaml-string)
+  "Read in YAML-STRING and create a hash."
+  (yaml:parse yaml-string))
 
 (defun hash-from-yaml-file (filename)
   "Read in FILENAME and create a hash."
-  (yaml:parse (file-get-contents filename)))
+  (hash-from-yaml-string (file-get-contents filename)))
+
+(defmacro with-hashy ((target &key (type :json)) &body body)
+  "Create and bind to HASHY object (hash-table) from the TARGET.
+
+- If TARGET is a pathname, will read in the file and decode.
+- If TARGET is a string, will decode the contents.
+- todo: If TARGET is a URI, will retrieve remote contents and decode."
+  `(progn
+     (let (fn)
+     ,(cond
+        ;; Handle json pathname
+        ((and (eq :json type)
+              (pathnamep target))
+         `(progn
+            (setf fn #'hash-from-json-file)))
+
+        ;; Handle json strings
+        ((and (eq :json type)
+              (stringp target))
+         `(progn
+            (setf fn #'hash-from-json-string)))
+
+        ;; Handle yaml pathname
+        ((and (eq :yaml type)
+              (pathnamep target))
+         `(progn
+            (setf fn #'hash-from-yaml-file)))
+
+        ;; Handle yaml strings
+        ((and (eq :yaml type)
+              (stringp target))
+         `(progn
+            (setf fn #'hash-from-yaml-string)))
+
+        )
+     (let ((hashy (funcall fn ,target)))
+       ,@body))))
 
 (defun dump (object)
   "Return the object as json."
