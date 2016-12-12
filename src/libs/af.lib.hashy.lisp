@@ -62,7 +62,7 @@
        alist)
 
       ;; We receive something like '((:list . "ofStuff"))
-      ((listp (car (car alist)))
+      ((listp (caar alist))
        (mapcar (lambda (item)
                  (alist-to-hash item))
                alist))

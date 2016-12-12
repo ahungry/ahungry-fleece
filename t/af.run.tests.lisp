@@ -100,7 +100,7 @@
         )
 
        ) ;; end suite
-      (sb-ext:exit :code 0)
-      (sb-ext:exit :code 1)))
+      (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
+      (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1))))))
 
 ;;; "af.run.tests" goes here. Hacks and glory await!
