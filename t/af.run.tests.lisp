@@ -20,6 +20,7 @@
 
 (defpackage af.run.tests
   (:use :cl
+        :af.lib.io
         :af.lib.ansi-colors
         :af.lib.loggy
         :af.lib.hashy
@@ -39,6 +40,16 @@
 
   (if (suite
        "af.lib"
+
+       (desc
+        "af.lib.io"
+
+        (it "Should be able to tell a directory"
+            (eq t (af.lib.io:directory-p (user-homedir-pathname))))
+
+        (it "Should be able to tell a file"
+            (eq t (af.lib.io:file-p "/dev/null")))
+        )
 
        (desc
         "af.lib.loggy"

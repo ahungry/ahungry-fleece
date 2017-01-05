@@ -22,10 +22,31 @@
   (:use :cl
         :cl-json)
   (:export
+   :directory-p
+   :directory-tree
+   :file-p
    :file-get-contents
    ))
 
 (in-package #:af.lib.io)
+
+(defun directory-p (path)
+  "Check if PATH is a directory (a directory will have the trailing slash)."
+  (let ((dir (directory path)))
+    (when dir
+      (not (pathname-name (car dir))))))
+
+(defun directory-tree (directory &optional (tree '()))
+  "Recursively get all files in a directory."
+  (let* ((path (pathname directory))
+         (directories (format nil "~a/*.*" path)))
+    (append tree directories)))
+
+(defun file-p (path)
+  "Check if PATH is a file (a directory will have the trailing slash)."
+  (let ((dir (directory path)))
+    (when dir
+      (when (pathname-name (car dir)) t))))
 
 (defun file-get-contents (filename)
   "Read in FILENAME and return as a single string."

@@ -25,7 +25,7 @@
 
 (asdf:defsystem #:ahungry-fleece
   :version "0.0.1"
-  :description "A JSON library."
+  :description "A general utility library of convenience functions and features."
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
   :depends-on (#:cl-json
