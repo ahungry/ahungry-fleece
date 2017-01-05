@@ -1,4 +1,5 @@
 LISP?= sbcl
+AF_LIB_TESTY_COLORIZE?= yes
 
 TFLAGS = --non-interactive \
 	--eval '(ql:quickload :ahungry-fleece)' \
@@ -23,7 +24,7 @@ $(EXE): $(CORE)
 	$(LISP) --core $< $(EFLAGS)
 
 test: $(EXE)
-	$< $(TFLAGS)
+	AF_LIB_TESTY_COLORIZE=$(AF_LIB_TESTY_COLORIZE) $< $(TFLAGS)
 
 clean:
 	-rm $(CORE)

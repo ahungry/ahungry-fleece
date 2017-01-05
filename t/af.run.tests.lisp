@@ -20,6 +20,7 @@
 
 (defpackage af.run.tests
   (:use :cl
+        :af.lib.ansi-colors
         :af.lib.loggy
         :af.lib.hashy
         :af.lib.testy)
@@ -31,6 +32,11 @@
 
 (defun main ()
   "Begin the tests!"
+  ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
+  (unless (and (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")
+               (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")) 0))
+      (setf af.lib.ansi-colors:*colorize-p* nil))
+
   (if (suite
        "af.lib"
 

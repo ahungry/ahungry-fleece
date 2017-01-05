@@ -32,28 +32,36 @@
   (defmacro suite (desc &rest results)
     "Describe a suite of tests."
     `(progn
-       (format t "~%~a~%" ,desc)
+       (with-color :blue
+         (format t "~%~a~%" ,desc))
        (let ((results (list ,@results)))
-         (format t "~%~a tests, ~a failures~%"
-                 (length results)
-                 (count nil results))
+         (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
+           (with-color color
+             (format t "~%~a tests, ~a failures~%"
+                     (length results)
+                     (count nil results))))
          (eq 0 (count nil results)))))
 
   (defmacro desc (desc &rest results)
     "Describe a set of test."
     `(progn
-       (format t "~%  ~a~%~%" ,desc)
+       (with-color :cyan
+         (format t "~%  ~a~%~%" ,desc))
        (let ((results (list ,@results)))
-         (format t "~%  ~a assertions, ~a failures~%~%"
-                 (length results)
-                 (count nil results))
+         (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
+           (with-color color
+             (format t "~%  ~a assertions, ~a failures~%~%"
+                     (length results)
+                     (count nil results))))
          (eq 0 (count nil results))))))
 
 (defun it (desc result)
   "Assert the body evaluates as expected."
-  (format t "    ~a ~a~%"
-          (if result "+" "-")
-          desc)
+  (let ((color (if result :green :red)))
+    (with-color color
+      (format t "    ~a ~a~%"
+              (if result "+" "-")
+              desc)))
   result)
 
 ;;; "af.lib.testy" goes here. Hacks and glory await!

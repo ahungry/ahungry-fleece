@@ -41,9 +41,11 @@
             ((:file "af.lib.hashy"
                     :depends-on ("af.lib.loggy"
                                  "af.lib.io"))
-             (:file "af.lib.testy")
+             (:file "af.lib.testy"
+                    :depends-on ("af.lib.ansi-colors"))
              (:file "af.lib.loggy"
                     :depends-on ("af.lib.io"))
+             (:file "af.lib.ansi-colors")
              (:file "af.lib.io")))
 
    ;; The main module
