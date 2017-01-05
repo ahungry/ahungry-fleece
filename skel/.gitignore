@@ -1,0 +1,10 @@
+#.*#
+*.swp
+/autom4te.cache/
+/autoscan.log
+/config.log
+/config.status
+/configure
+/Makefile
+/bin/skeleton
+/bin/skeleton.core

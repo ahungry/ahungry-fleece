@@ -1,0 +1,31 @@
+LISP?= sbcl
+AF_LIB_TESTY_COLORIZE?= yes
+
+TFLAGS = --non-interactive \
+	--eval '(ql:quickload :skeleton)' \
+	--eval '(skeleton.run.tests:main)'
+
+CFLAGS = --disable-debugger \
+	--eval '(sb-ext:save-lisp-and-die "bin/skeleton.core")'
+
+EFLAGS = --disable-debugger \
+	--eval '(ql:quickload :skeleton)' \
+	--eval '(sb-ext:save-lisp-and-die "bin/skeleton" :executable t)'
+
+CORE = bin/skeleton.core
+EXE = bin/skeleton
+
+all: $(EXE)
+
+$(CORE):
+	$(LISP) $(CFLAGS)
+
+$(EXE): $(CORE)
+	$(LISP) --core $< $(EFLAGS)
+
+test: $(EXE)
+	AF_LIB_TESTY_COLORIZE=$(AF_LIB_TESTY_COLORIZE) $< $(TFLAGS)
+
+clean:
+	-rm $(CORE)
+	-rm $(EXE)
