@@ -43,7 +43,8 @@ occurences of FROM-NAME to TO-NAME."
                   (out-content (cl-ppcre:regex-replace-all from-name in-content to-name))
                   (out-file (cl-ppcre:regex-replace-all from-name (format nil "~a" node) to-name))
                   (out-file (merge-pathnames (subseq out-file (length from-path)) to-path)))
-             (file-put-contents out-file out-content)
+             (file-put-contents out-file out-content :overwrite t)
+             out-file
              )))
     ))
 

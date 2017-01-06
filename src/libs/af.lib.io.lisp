@@ -66,7 +66,7 @@
                 collect line)))))
     (format nil "~{~a~^~%~}" lines)))
 
-(defun file-put-contents (filename content)
+(defun file-put-contents (filename content &key (overwrite nil))
   "Write to FILENAME the CONTENT string sent in.
 
 If the file exists, will append to the file.
@@ -77,7 +77,7 @@ If the file does not exist, will create it."
          (with-open-file
              (stream filename
                      :direction :output
-                     :if-exists :append
+                     :if-exists (if overwrite :supersede :append)
                      :if-does-not-exist :create)
            (loop for line in lines
                 do (write-line line stream )))))

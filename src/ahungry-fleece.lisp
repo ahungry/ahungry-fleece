@@ -21,12 +21,29 @@
 (defpackage ahungry-fleece
   (:use :cl
         :cl-json
+        :quickproject
+        :af.lib.clone
         :af.lib.hashy)
-  (:export :main))
+  (:export :main
+           :make-project
+           ))
 
 (in-package #:ahungry-fleece)
 
 (defparameter *base-directory* (asdf:system-source-directory :ahungry-fleece))
+
+(defun make-project (directory)
+  "Create a new project in DIREcTORY with name equal to the directory.
+
+Similar to quickproject:make-project, but also ensures the
+created files closely match what is available in this own project's
+directory structure setup (with CLI based unit test etc.)."
+  (quickproject:make-project directory)
+  (clone-project
+   (merge-pathnames #P"skel" *base-directory*)
+   directory
+   "skeleton"
+   (pathname-name directory)))
 
 (defun main ()
   "Well...guess we can print the version here."
