@@ -26,13 +26,12 @@
    :clone-project
    ))
 
-(in-package #:af.lib.io)
+(in-package #:af.lib.clone)
 
 (defun clone-project (from-path to-path from-name to-name)
   "Recursively copy FROM-PATH to TO-PATH, while replacing all
 occurences of FROM-NAME to TO-NAME."
-  (let ((dir (directory path)))
-    (when dir
-      (not (pathname-name (car dir))))))
+  (let ((nodes (directory-tree from-path)))
+    nodes))
 
 ;;; "af.lib.clone" goes here. Hacks and glory await!

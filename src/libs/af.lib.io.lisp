@@ -36,11 +36,15 @@
     (when dir
       (not (pathname-name (car dir))))))
 
-(defun directory-tree (directory &optional (tree '()))
-  "Recursively get all files in a directory."
+(defun directory-tree (directory)
+  "Recursively get all files in a DIRECTORY."
   (let* ((path (pathname directory))
-         (directories (format nil "~a/*.*" path)))
-    (append tree directories)))
+         (nodes (directory (format nil "~a/*.*" path))))
+    ;; Recursively grab the directories
+    (loop for node in nodes
+       when (directory-p node)
+       do (setq nodes (append nodes (directory-tree node))))
+    nodes))
 
 (defun file-p (path)
   "Check if PATH is a file (a directory will have the trailing slash)."
@@ -68,6 +72,7 @@ If the file exists, will append to the file.
 
 If the file does not exist, will create it."
   (let ((lines (split-sequence:split-sequence #\Newline content)))
+    (ensure-directories-exist filename)
          (with-open-file
              (stream filename
                      :direction :output
