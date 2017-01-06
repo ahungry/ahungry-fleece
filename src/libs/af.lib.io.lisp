@@ -59,6 +59,21 @@
              (loop for line = (read-line stream nil 'eof)
                 until (eq line 'eof)
                 collect line)))))
-    (format nil "~{~a~%~}" lines)))
+    (format nil "~{~a~^~%~}" lines)))
+
+(defun file-put-contents (filename content)
+  "Write to FILENAME the CONTENT string sent in.
+
+If the file exists, will append to the file.
+
+If the file does not exist, will create it."
+  (let ((lines (split-sequence:split-sequence #\Newline content)))
+         (with-open-file
+             (stream filename
+                     :direction :output
+                     :if-exists :append
+                     :if-does-not-exist :create)
+           (loop for line in lines
+                do (write-line line stream )))))
 
 ;;; "af.lib.io" goes here. Hacks and glory await!

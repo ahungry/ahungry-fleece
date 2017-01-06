@@ -29,6 +29,7 @@
 
 (in-package #:af.run.tests)
 
+(defparameter *base-directory* (asdf:system-source-directory :ahungry-fleece))
 (defparameter *yml* nil "The yml file for testing.")
 
 (defun main ()

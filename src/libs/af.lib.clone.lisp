@@ -1,4 +1,4 @@
-;; Ahungry Fleece - A JSON (and friends) utility library.
+;; Ahungry Fleece - A utility library.
 ;; Copyright (C) 2016 Matthew Carter <m@ahungry.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify
@@ -14,22 +14,25 @@
 ;; You should have received a copy of the GNU Affero General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-;;;; ahungry-fleece.lisp
+;;;; af.lib.clone.lisp
 
 (in-package #:cl-user)
 
-(defpackage ahungry-fleece
+(defpackage af.lib.clone
   (:use :cl
-        :cl-json
-        :af.lib.hashy)
-  (:export :main))
+        :af.lib.io
+        :cl-json)
+  (:export
+   :clone-project
+   ))
 
-(in-package #:ahungry-fleece)
+(in-package #:af.lib.io)
 
-(defparameter *base-directory* (asdf:system-source-directory :ahungry-fleece))
+(defun clone-project (from-path to-path from-name to-name)
+  "Recursively copy FROM-PATH to TO-PATH, while replacing all
+occurences of FROM-NAME to TO-NAME."
+  (let ((dir (directory path)))
+    (when dir
+      (not (pathname-name (car dir))))))
 
-(defun main ()
-  "Well...guess we can print the version here."
-  (print "0.0.2"))
-
-;;; "ahungry-fleece" goes here. Hacks and glory await!
+;;; "af.lib.clone" goes here. Hacks and glory await!
