@@ -30,8 +30,7 @@
   :license "GPLv3"
   :depends-on (#:cl-json
                #:cl-yaml
-               #:split-sequence
-               #:quickproject)
+               #:split-sequence)
   :serial t
   :components
   (
