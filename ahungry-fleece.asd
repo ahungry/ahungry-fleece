@@ -47,6 +47,8 @@
              (:file "af.lib.loggy"
                     :depends-on ("af.lib.io"))
              (:file "af.lib.ansi-colors")
+             (:file "af.lib.clone"
+                    :depends-on ("af.lib.io"))
              (:file "af.lib.io")))
 
    ;; The main module

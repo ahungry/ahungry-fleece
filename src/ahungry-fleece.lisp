@@ -25,14 +25,14 @@
         :af.lib.clone
         :af.lib.hashy)
   (:export :main
-           :make-project
+           :make-skeleton-project
            ))
 
 (in-package #:ahungry-fleece)
 
 (defparameter *base-directory* (asdf:system-source-directory :ahungry-fleece))
 
-(defun make-project (directory)
+(defun make-skeleton-project (directory)
   "Create a new project in DIREcTORY with name equal to the directory.
 
 Similar to quickproject:make-project, but also ensures the
