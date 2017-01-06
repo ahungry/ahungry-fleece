@@ -1,4 +1,4 @@
-;; Ahungry Fleece - A JSON (and friends) utility library.
+;; Ahungry Fleece - A utility library.
 ;; Copyright (C) 2016 Matthew Carter <m@ahungry.com>
 ;;
 ;; This program is free software: you can redistribute it and/or modify

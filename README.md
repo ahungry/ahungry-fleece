@@ -13,7 +13,8 @@ rapid development in one of the greatest languages around (Lisp!)
 - [Setup](#setup)
   * [Install](#installation)
 - [Usage](#usage)
-  * [RefPath (fast YAML/JSON/HASH selection)](#refpath)
+  * [IO](#io)
+  * [JSON/YAML](#refpath)
   * [Logging](#logging)
   * [Testing](#testing)
 - [About](#about)
@@ -38,7 +39,27 @@ git clone https://github.com/ahungry/ahungry-fleece
 ```
 
 # Usage
-## RefPath
+## IO
+You can easily write to and read from files with some of the following
+convenience functions.
+
+```lisp
+(use-package :af.lib.io)
+(file-put-contents "/tmp/helloWorld" "Hello World!")
+(file-get-contents "/tmp/helloWorld")
+```
+
+Or get directory/file status with:
+
+```lisp
+(directory-p "/dev") ;; t
+(directory-p "/dev/null") ;; nil
+(file-p "/dev") ;; nil
+(file-p "/dev/null") ;; t
+```
+
+## JSON/YAML
+### RefPath
 There is a way to quickly select a node in some given YAML or JSON or
 HASH-TABLE.
 
