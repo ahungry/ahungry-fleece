@@ -32,7 +32,7 @@
   ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
   (unless (and (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")
                (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")) 0))
-      (setf skeleton.lib.ansi-colors:*colorize-p* nil))
+      (setf af.lib.ansi-colors:*colorize-p* nil))
 
   (if (suite
        "skeleton.lib"
