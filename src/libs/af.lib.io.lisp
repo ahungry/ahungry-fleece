@@ -26,6 +26,7 @@
    :directory-tree
    :file-p
    :file-get-contents
+   :file-put-contents
    ))
 
 (in-package #:af.lib.io)
