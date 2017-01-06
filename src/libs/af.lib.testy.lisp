@@ -20,7 +20,8 @@
 
 (defpackage af.lib.testy
   (:use :cl
-        :cl-json)
+        :cl-json
+        :af.lib.ansi-colors)
   (:export
    :suite
    :desc
@@ -32,7 +33,7 @@
   (defmacro suite (desc &rest results)
     "Describe a suite of tests."
     `(progn
-       (with-color :blue
+       (af.lib.ansi-colors:with-color :blue
          (format t "~%~a~%" ,desc))
        (let ((results (list ,@results)))
          (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
@@ -45,7 +46,7 @@
   (defmacro desc (desc &rest results)
     "Describe a set of test."
     `(progn
-       (with-color :cyan
+       (af.lib.ansi-colors:with-color :cyan
          (format t "~%  ~a~%~%" ,desc))
        (let ((results (list ,@results)))
          (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
@@ -58,7 +59,7 @@
 (defun it (desc result)
   "Assert the body evaluates as expected."
   (let ((color (if result :green :red)))
-    (with-color color
+    (af.lib.ansi-colors:with-color color
       (format t "    ~a ~a~%"
               (if result "+" "-")
               desc)))

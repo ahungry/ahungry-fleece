@@ -17,6 +17,7 @@ rapid development in one of the greatest languages around (Lisp!)
   * [JSON/YAML](#refpath)
   * [Logging](#logging)
   * [Testing](#testing)
+  * [Colorizing](#colorizing)
 - [About](#about)
   * [Maintainer](#maintainer)
   * [License](#license)
@@ -148,6 +149,20 @@ your.suite
   2 assertions, 1 failures
 
 1 tests, 1 failures
+```
+
+## Colorizing
+You can colorize shell output (via the shell escape codes) by using:
+
+```lisp
+(use-package :af.lib.ansi-colors)
+(with-color :blue (format t "Blue text!"))
+```
+
+To avoid colors in the SLIME REPL, simply set:
+
+```lisp
+(setq af.lib.ansi-colors:*colorize-p* nil)
 ```
 
 # About
