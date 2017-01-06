@@ -18,6 +18,7 @@ rapid development in one of the greatest languages around (Lisp!)
   * [Logging](#logging)
   * [Testing](#testing)
   * [Colorizing](#colorizing)
+  * [Clone](#clone)
 - [About](#about)
   * [Maintainer](#maintainer)
   * [License](#license)
@@ -163,6 +164,14 @@ To avoid colors in the SLIME REPL, simply set:
 
 ```lisp
 (setq af.lib.ansi-colors:*colorize-p* nil)
+```
+
+## Clone
+You can also quickly create/bootstrap a project with a similar
+directory / makefile setup as this one, by using:
+
+```lisp
+(ahungry-fleece:make-skelly-project "/some/path/here")
 ```
 
 # About
