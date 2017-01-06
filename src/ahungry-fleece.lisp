@@ -49,6 +49,6 @@ directory structure setup (with CLI based unit test etc.)."
 
 (defun main ()
   "Well...guess we can print the version here."
-  (print "0.0.2"))
+  (print "0.2.0"))
 
 ;;; "ahungry-fleece" goes here. Hacks and glory await!
