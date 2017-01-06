@@ -3,4 +3,4 @@
 # Handle generating the makefile
 autoconf
 ./configure
-make
+make && make test
