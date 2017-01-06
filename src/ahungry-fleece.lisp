@@ -21,29 +21,31 @@
 (defpackage ahungry-fleece
   (:use :cl
         :cl-json
-        :quickproject
+        :af.lib.io
         :af.lib.clone
         :af.lib.hashy)
   (:export :main
-           :make-skeleton-project
+           :make-skelly-project
            ))
 
 (in-package #:ahungry-fleece)
 
 (defparameter *base-directory* (asdf:system-source-directory :ahungry-fleece))
 
-(defun make-skeleton-project (directory)
+(defun make-skelly-project (directory)
   "Create a new project in DIREcTORY with name equal to the directory.
 
 Similar to quickproject:make-project, but also ensures the
 created files closely match what is available in this own project's
 directory structure setup (with CLI based unit test etc.)."
-  (quickproject:make-project directory)
-  (clone-project
+  (print
+   (clone-project
    (merge-pathnames #P"skel" *base-directory*)
    directory
    "skeleton"
    (pathname-name directory)))
+  (pushnew (truename directory) asdf:*central-registry* :test 'equal)
+  (file-get-contents (merge-pathnames "README.md" (truename directory))))
 
 (defun main ()
   "Well...guess we can print the version here."
