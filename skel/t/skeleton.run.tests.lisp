@@ -28,6 +28,8 @@
 
 (in-package #:skeleton.run.tests)
 
+(defparameter *base-directory* (asdf:system-source-directory :skeleton))
+
 (defun main ()
   "Begin the tests!"
   ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)

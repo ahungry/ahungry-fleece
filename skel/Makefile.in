@@ -6,6 +6,7 @@ TFLAGS = --non-interactive \
 	--eval '(skeleton.run.tests:main)'
 
 CFLAGS = --disable-debugger \
+	--eval "(mapc \#'require '(sb-bsd-sockets sb-posix sb-introspect sb-cltl2 sb-rotate-byte sb-cover asdf))" \
 	--eval '(sb-ext:save-lisp-and-die "bin/skeleton.core")'
 
 EFLAGS = --disable-debugger \
