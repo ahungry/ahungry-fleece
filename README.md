@@ -151,7 +151,7 @@ your.suite
 
 1 tests, 1 failures
 ```
-![testing](http://ahungry.com/images/test-shot.png)
+![testing](http://ahungry.com/img/test-shot.png)
 
 
 ## Colorizing
