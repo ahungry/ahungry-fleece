@@ -31,16 +31,83 @@
 (in-package #:cl-user)
 
 (defpackage af.lib.coverage
-  (:use :cl)
-  (:export :report-json
+  (:use :cl :sb-c :sb-cover)
+  (:export :report-cli
            :with-coverage
            ))
 
 (in-package #:af.lib.coverage)
 
-(defun report-json (ok)
-  "stub"
-  nil)
+(defun report-cli (directory)
+  "Print a code coverage report of all instrumented files into DIRECTORY.
+If DIRECTORY does not exist, it will be created. The main report will be
+printed to the file cover-index.html. The external format of the source
+files can be specified with the EXTERNAL-FORMAT parameter.
+
+If the keyword argument FORM-MODE has the value :CAR, the annotations in
+the coverage report will be placed on the CARs of any cons-forms, while if
+it has the value :WHOLE the whole form will be annotated (the default).
+The former mode shows explicitly which forms were instrumented, while the
+latter mode is generally easier to read."
+  (let* ((paths)
+         (directory (sb-cover::pathname-as-directory directory))
+         (*default-pathname-defaults* (translate-logical-pathname directory)))
+    (ensure-directories-exist *default-pathname-defaults*)
+    (maphash (lambda (k v)
+               (declare (ignore v))
+               (let* ((pk (translate-logical-pathname k))
+                      (n (format nil "~(~{~2,'0X~}~)"
+                                 (coerce (md5:md5sum-string
+                                          (sb-ext:native-namestring pk))
+                                         'list)))
+                      (path (make-pathname :name n :type "html" :defaults directory)))
+                 (when (probe-file k)
+                   (ensure-directories-exist pk)
+                   (with-open-file (stream path
+                                           :direction :output
+                                           :if-exists :supersede
+                                           :if-does-not-exist :create)
+                     (push (list* k n (sb-cover::report-file k stream :default))
+                           paths)))))
+             *code-coverage-info*)
+    (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
+      (with-open-stream (stream *standard-output*)
+        ;;(sb-cover::write-styles stream)
+        (unless paths
+          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+          (format stream "<h3>No code coverage data found.</h3>")
+          (close stream)
+          (return-from report-cli))
+
+        ;; @todo Get format under 80 char width
+        (format stream "                                        EXPRESSION                          BRANCH~%")
+        (format stream "----------------------------------------------------------------------------------------------------~%")
+        (format stream "Source File                    ~{~12A~}~%"
+                (list
+                 "Covered" "Total" "      %"
+                 "Covered" "Total" "      %"))
+        (format stream "----------------------------------------------------------------------------------------------------~%")
+        (setf paths (sort paths #'string< :key #'car))
+        (loop for prev = nil then source-file
+           for (source-file report-file expression branch) in paths
+           for even = nil then (not even)
+           do (when (or (null prev)
+                        (not (equal (pathname-directory (pathname source-file))
+                                    (pathname-directory (pathname prev)))))
+                (format stream "~%~%~A"
+                        (namestring (make-pathname :directory (pathname-directory (pathname source-file)))))
+                )
+           do (format stream "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
+                      (enough-namestring (pathname source-file)
+                                         (pathname source-file))
+                      (list (sb-cover::ok-of expression)
+                            (sb-cover::all-of expression)
+                            (sb-cover::percent expression)
+                            (sb-cover::ok-of branch)
+                            (sb-cover::all-of branch)
+                            (sb-cover::percent branch))))
+        (format stream "~%~%"))
+      report-file)))
 
 ;; Newly contributed GPLv3 code goes down here
 (eval-when (:compile-toplevel :load-toplevel :execute)

@@ -151,6 +151,8 @@ your.suite
 
 1 tests, 1 failures
 ```
+![testing](http://ahungry.com/images/test-shot.png)
+
 
 ## Colorizing
 You can colorize shell output (via the shell escape codes) by using:

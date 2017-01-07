@@ -122,14 +122,19 @@
         (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
         (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1)))))
 
+    (with-color :light-blue
+      (format t "~%Full coverage report generated in: ~a~%~%" (merge-pathnames #P"report/" *base-directory*))
+      (with-color :blue (format t "Summary of report:~%"))
+      )
+
     ;; Produce a report of coverage
-    ;; @todo Change this to CLI based output
+    ;; @todo Make this optional so it isn't generated each time...
     (with-open-stream (*error-output* (make-broadcast-stream))
       (sb-cover:report (merge-pathnames #P"report/" *base-directory*)))
 
-    (af.lib.coverage:report-json (merge-pathnames #P"report/" *base-directory*))
-    (with-color :cyan
-      (format t "Coverage report generated in: ~a~%" (merge-pathnames #P"report/" *base-directory*)))
+    (with-open-stream (*error-output* (make-broadcast-stream))
+      (af.lib.coverage:report-cli (merge-pathnames #P"report/" *base-directory*)))
+
     )
   )
 
