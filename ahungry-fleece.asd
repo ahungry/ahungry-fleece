@@ -30,6 +30,7 @@
   :license "GPLv3"
   :depends-on (#:cl-json
                #:cl-yaml
+               #:md5
                #:split-sequence)
   :serial t
   :components
@@ -42,7 +43,9 @@
                     :depends-on ("af.lib.loggy"
                                  "af.lib.io"))
              (:file "af.lib.testy"
-                    :depends-on ("af.lib.ansi-colors"))
+                    :depends-on ("af.lib.ansi-colors"
+                                 "af.lib.coverage"))
+             (:file "af.lib.coverage")
              (:file "af.lib.loggy"
                     :depends-on ("af.lib.io"))
              (:file "af.lib.ansi-colors")

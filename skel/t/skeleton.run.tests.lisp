@@ -22,6 +22,7 @@
   (:use :cl
         :skeleton.lib.stub
         :af.lib.ansi-colors
+        :af.lib.coverage
         :af.lib.testy)
   (:export :main))
 
@@ -32,19 +33,32 @@
   ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
   (unless (and (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")
                (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")) 0))
-      (setf af.lib.ansi-colors:*colorize-p* nil))
+    (setf af.lib.ansi-colors:*colorize-p* nil))
 
-  (if (suite
-       "skeleton.lib"
+  (af.lib.coverage:with-coverage :skeleton
+    (if (suite
+         "skeleton.lib"
 
-       (desc
-        "skeleton.lib.stub"
+         (desc
+          "skeleton.lib.stub"
 
-        (it "Should echo the input"
-            (eq 3 (skeleton.lib.stub:echo 3)))
-        )
-       ) ;; end suite
-      (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
-      (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1))))))
+          (it "Should echo the input"
+              (eq 3 (skeleton.lib.stub:echo 3)))
+          )
+         ) ;; end suite
+        (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
+        (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1)))))
+
+    ;; Produce a report of coverage
+    ;; @todo Change this to CLI based output
+    (with-open-stream (*error-output* (make-broadcast-stream))
+      (sb-cover:report (merge-pathnames #P"report/" *base-directory*)))
+
+    (af.lib.coverage:report-json (merge-pathnames #P"report/" *base-directory*))
+    (with-color :cyan
+      (format t "Coverage report generated in: ~a~%" (merge-pathnames #P"report/" *base-directory*)))
+
+    )
+  )
 
 ;;; "skeleton.run.tests" goes here. Hacks and glory await!
