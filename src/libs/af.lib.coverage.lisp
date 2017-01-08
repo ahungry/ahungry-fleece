@@ -31,12 +31,106 @@
 (in-package #:cl-user)
 
 (defpackage af.lib.coverage
-  (:use :cl :sb-c :sb-cover)
+  (:use :cl
+        :sb-c
+        :sb-cover
+        :af.lib.io
+        :af.lib.hashy)
   (:export :report-cli
+           :report-json
            :with-coverage
            ))
 
 (in-package #:af.lib.coverage)
+
+(defun report-json (directory)
+  "Print a code coverage report of all instrumented files into DIRECTORY.
+If DIRECTORY does not exist, it will be created. The main report will be
+printed to the file cover-index.html. The external format of the source
+files can be specified with the EXTERNAL-FORMAT parameter.
+
+If the keyword argument FORM-MODE has the value :CAR, the annotations in
+the coverage report will be placed on the CARs of any cons-forms, while if
+it has the value :WHOLE the whole form will be annotated (the default).
+The former mode shows explicitly which forms were instrumented, while the
+latter mode is generally easier to read."
+  (let* ((paths)
+         (directory (sb-cover::pathname-as-directory directory))
+         (*default-pathname-defaults* (translate-logical-pathname directory)))
+    (ensure-directories-exist *default-pathname-defaults*)
+    (maphash (lambda (k v)
+               (declare (ignore v))
+               (let* ((pk (translate-logical-pathname k))
+                      (n (format nil "~(~{~2,'0X~}~)"
+                                 (coerce (md5:md5sum-string
+                                          (sb-ext:native-namestring pk))
+                                         'list)))
+                      (path (make-pathname :name n :type "html" :defaults directory)))
+                 (when (probe-file k)
+                   (ensure-directories-exist pk)
+                   (with-open-file (stream path
+                                           :direction :output
+                                           :if-exists :supersede
+                                           :if-does-not-exist :create)
+                     (push (list* k n (sb-cover::report-file k stream :default))
+                           paths)))))
+             *code-coverage-info*)
+    (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory))
+          (directory-node "")
+          (json (make-hash-table :test #'equal)))
+      (with-open-stream (stream *standard-output*)
+        ;;(sb-cover::write-styles stream)
+        (unless paths
+          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+          (format stream "<h3>No code coverage data found.</h3>")
+          (close stream)
+          (return-from report-json))
+
+        (setf paths (sort paths #'string< :key #'car))
+        (loop for prev = nil then source-file
+           for (source-file report-file expression branch) in paths
+           for even = nil then (not even)
+           do (when (or (null prev)
+                        (not (equal (pathname-directory (pathname source-file))
+                                    (pathname-directory (pathname prev)))))
+                ;; Create a new directory key for the JSON
+                (setf directory-node (namestring (make-pathname :directory (pathname-directory (pathname source-file)))))
+                (setf (gethash directory-node json) (list))
+                )
+           do (let ((json-file-coverage (make-hash-table :test #'equal))
+                    (json-line-coverage (make-hash-table :test #'equal))
+                    (json-branch-coverage (make-hash-table :test #'equal)))
+
+                ;; Now build the branches
+                (setf (gethash "covered" json-line-coverage)
+                      (sb-cover::ok-of expression))
+                (setf (gethash "total" json-line-coverage)
+                      (sb-cover::all-of expression))
+                (setf (gethash "percent" json-line-coverage)
+                      (if (sb-cover::percent expression)
+                          (float (sb-cover::percent expression))
+                          nil))
+
+                (setf (gethash "covered" json-branch-coverage)
+                      (sb-cover::ok-of branch))
+                (setf (gethash "total" json-branch-coverage)
+                      (sb-cover::all-of branch))
+                (setf (gethash "percent" json-branch-coverage)
+                      (if (sb-cover::percent branch)
+                          (float (sb-cover::percent branch))
+                          nil))
+
+                (setf (gethash "name" json-file-coverage)
+                      (format nil "~a" (enough-namestring (pathname source-file) (pathname source-file))))
+                (setf (gethash "line" json-file-coverage) json-line-coverage)
+                (setf (gethash "branch" json-file-coverage) json-branch-coverage)
+
+                (push json-file-coverage (gethash directory-node json))
+             ))
+        ;;(file-put-contents "~a" "~a" (
+        (print directory)
+      (print (dump json))
+      ))))
 
 (defun report-cli (directory)
   "Print a code coverage report of all instrumented files into DIRECTORY.

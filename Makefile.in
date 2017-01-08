@@ -27,6 +27,10 @@ $(EXE): $(CORE)
 test: $(EXE)
 	AF_LIB_TESTY_COLORIZE=$(AF_LIB_TESTY_COLORIZE) $< $(TFLAGS)
 
+coverage: $(EXE)
+	AF_LIB_TESTY_COVERAGE='y' \
+	AF_LIB_TESTY_COLORIZE=$(AF_LIB_TESTY_COLORIZE) $< $(TFLAGS)
+
 clean:
 	-rm $(CORE)
 	-rm $(EXE)

@@ -39,13 +39,14 @@
    (:module "libs"
             :pathname "src/libs"
             :components
-            ((:file "af.lib.hashy"
+            ((:file "af.lib.coverage"
+                    :depends-on ("af.lib.hashy"))
+             (:file "af.lib.hashy"
                     :depends-on ("af.lib.loggy"
                                  "af.lib.io"))
              (:file "af.lib.testy"
                     :depends-on ("af.lib.ansi-colors"
                                  "af.lib.coverage"))
-             (:file "af.lib.coverage")
              (:file "af.lib.loggy"
                     :depends-on ("af.lib.io"))
              (:file "af.lib.ansi-colors")

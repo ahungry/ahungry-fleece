@@ -138,7 +138,7 @@
   "Return the object as json."
   (yaml:emit-to-string object))
 
-(defun ref (path object &optional value)
+(defun ref (path object &optional value (split-char #\/))
   "Query a reference to a json or yaml object.
 
 PATH is a path such as #/key/anotherKey/anotherKey/node.
@@ -162,7 +162,7 @@ as such:
   (ref \"#/definitions/Pet/name\" obj)
 
 Will return the setf'able value \"Fido\"."
-  (let ((args (cdr (split-sequence:split-sequence #\/ path)))
+  (let ((args (cdr (split-sequence:split-sequence split-char path)))
         (chain '("#"))
         (iter 0))
     (reduce
