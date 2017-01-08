@@ -136,23 +136,22 @@
   ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
   (af.lib.coverage:with-coverage :ahungry-fleece
     (test)
-    (with-color :light-blue
-      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"report/" *base-directory*))
-      (format t "~%Coverage summary generated in: ~a/coverage.json~%~%" (merge-pathnames #P"report/" *base-directory*))
-      (with-color :blue (format t "Summary of report:~%"))
-      )
-
-    ;; Produce a report of coverage
-    ;; @todo Make this optional so it isn't generated each time...
+    (terpri)
+    (with-color :blue (format t "Summary of coverage:~%"))
     (with-open-stream (*error-output* (make-broadcast-stream))
       (sb-cover:report (merge-pathnames #P"report/" *base-directory*)))
 
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-cli (merge-pathnames #P"report/" *base-directory*)))
+      (af.lib.coverage:report-cli (merge-pathnames #P"report/" *base-directory*))
+      )
 
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (print "JSON time")
       (af.lib.coverage:report-json (merge-pathnames #P"report/" *base-directory*))
+      )
+
+    (with-color :light-blue
+      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"report/" *base-directory*))
+      (format t "~%Coverage summary generated in: ~acoverage.json~%~%" (merge-pathnames #P"report/" *base-directory*))
       )
     )
   )

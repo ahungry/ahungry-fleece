@@ -75,15 +75,16 @@ latter mode is generally easier to read."
                      (push (list* k n (sb-cover::report-file k stream :default))
                            paths)))))
              *code-coverage-info*)
-    (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory))
+    (let ((report-file (make-pathname :name "coverage" :type "json" :defaults directory))
           (directory-node "")
           (json (make-hash-table :test #'equal)))
-      (with-open-stream (stream *standard-output*)
+      (with-open-file (stream report-file
+                              :direction :output :if-exists :supersede
+                              :if-does-not-exist :create)
         ;;(sb-cover::write-styles stream)
         (unless paths
           (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
           (format stream "<h3>No code coverage data found.</h3>")
-          (close stream)
           (return-from report-json))
 
         (setf paths (sort paths #'string< :key #'car))
@@ -127,9 +128,7 @@ latter mode is generally easier to read."
 
                 (push json-file-coverage (gethash directory-node json))
              ))
-        ;;(file-put-contents "~a" "~a" (
-        (print directory)
-      (print (dump json))
+        (format stream (dump json))
       ))))
 
 (defun report-cli (directory)
@@ -165,22 +164,20 @@ latter mode is generally easier to read."
                            paths)))))
              *code-coverage-info*)
     (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
-      (with-open-stream (stream *standard-output*)
-        ;;(sb-cover::write-styles stream)
+        ;;(sb-cover::write-styles t)
         (unless paths
           (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
-          (format stream "<h3>No code coverage data found.</h3>")
-          (close stream)
+          (format t "<h3>No code coverage data found.</h3>")
           (return-from report-cli))
 
         ;; @todo Get format under 80 char width
-        (format stream "                                        EXPRESSION                          BRANCH~%")
-        (format stream "----------------------------------------------------------------------------------------------------~%")
-        (format stream "Source File                    ~{~12A~}~%"
+        (format t "                                        EXPRESSION                          BRANCH~%")
+        (format t "----------------------------------------------------------------------------------------------------~%")
+        (format t "Source File                    ~{~12A~}~%"
                 (list
                  "Covered" "Total" "      %"
                  "Covered" "Total" "      %"))
-        (format stream "----------------------------------------------------------------------------------------------------~%")
+        (format t "----------------------------------------------------------------------------------------------------~%")
         (setf paths (sort paths #'string< :key #'car))
         (loop for prev = nil then source-file
            for (source-file report-file expression branch) in paths
@@ -188,10 +185,10 @@ latter mode is generally easier to read."
            do (when (or (null prev)
                         (not (equal (pathname-directory (pathname source-file))
                                     (pathname-directory (pathname prev)))))
-                (format stream "~%~%~A"
+                (format t "~%~%~A"
                         (namestring (make-pathname :directory (pathname-directory (pathname source-file)))))
                 )
-           do (format stream "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
+           do (format t "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
                       (enough-namestring (pathname source-file)
                                          (pathname source-file))
                       (list (sb-cover::ok-of expression)
@@ -200,7 +197,7 @@ latter mode is generally easier to read."
                             (sb-cover::ok-of branch)
                             (sb-cover::all-of branch)
                             (sb-cover::percent branch))))
-        (format stream "~%~%"))
+        (format t "~%~%")
       report-file)))
 
 ;; Newly contributed GPLv3 code goes down here
