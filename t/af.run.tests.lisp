@@ -44,7 +44,6 @@
 
 (defun test ()
   "Begin the tests!"
-  ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
   (unless (and (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")
                (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")) 0))
     (setf af.lib.ansi-colors:*colorize-p* nil))
@@ -139,19 +138,19 @@
     (terpri)
     (with-color :blue (format t "Summary of coverage:~%"))
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (sb-cover:report (merge-pathnames #P"report/" *base-directory*)))
+      (sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
 
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-cli (merge-pathnames #P"report/" *base-directory*))
+      (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
       )
 
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-json (merge-pathnames #P"report/" *base-directory*))
+      (af.lib.coverage:report-json (merge-pathnames #P"coverage/" *base-directory*))
       )
 
     (with-color :light-blue
-      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"report/" *base-directory*))
-      (format t "~%Coverage summary generated in: ~acoverage.json~%~%" (merge-pathnames #P"report/" *base-directory*))
+      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"coverage/" *base-directory*))
+      (format t "~%Coverage summary generated in: ~acoverage.json~%~%" (merge-pathnames #P"coverage/" *base-directory*))
       )
     )
   )

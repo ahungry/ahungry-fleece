@@ -34,3 +34,6 @@ coverage: $(EXE)
 clean:
 	-rm $(CORE)
 	-rm $(EXE)
+
+.PHONY:
+	all test

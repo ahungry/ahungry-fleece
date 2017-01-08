@@ -31,9 +31,15 @@
 (defparameter *base-directory* (asdf:system-source-directory :skeleton))
 
 (defun main ()
+  "Run the tests, or the tests with coverage."
+  (if (and (sb-ext:posix-getenv "AF_LIB_TESTY_COVERAGE")
+           (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COVERAGE")) 0))
+      (coverage)
+      (test)
+      ))
+
+(defun test ()
   "Begin the tests!"
-  ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
-  (af.lib.coverage:with-coverage :skeleton
     (unless (and (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")
                  (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COLORIZE")) 0))
       (setf af.lib.ansi-colors:*colorize-p* nil))
@@ -50,16 +56,30 @@
          ) ;; end suite
         (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
         (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1)))))
+    )
 
-    ;; Produce a report of coverage
-    ;; @todo Change this to CLI based output
+(defun coverage ()
+  "Begin the tests!"
+  ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
+  (af.lib.coverage:with-coverage :skeleton
+    (test)
+    (terpri)
+    (with-color :blue (format t "Summary of coverage:~%"))
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (sb-cover:report (merge-pathnames #P"report/" *base-directory*)))
+      (sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
 
-    (af.lib.coverage:report-json (merge-pathnames #P"report/" *base-directory*))
-    (with-color :cyan
-      (format t "Coverage report generated in: ~a~%" (merge-pathnames #P"report/" *base-directory*)))
+    (with-open-stream (*error-output* (make-broadcast-stream))
+      (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
+      )
 
+    (with-open-stream (*error-output* (make-broadcast-stream))
+      (af.lib.coverage:report-json (merge-pathnames #P"coverage/" *base-directory*))
+      )
+
+    (with-color :light-blue
+      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"coverage/" *base-directory*))
+      (format t "~%Coverage summary generated in: ~acoverage.json~%~%" (merge-pathnames #P"coverage/" *base-directory*))
+      )
     )
   )
 
