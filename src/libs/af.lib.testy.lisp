@@ -36,12 +36,12 @@
        (af.lib.ansi-colors:with-color :blue
          (format t ,format-title ,desc))
        (let ((results (list ,@results)))
-         (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
+         (let ((color (if (zerop (count nil results)) :light-green :light-red)))
            (with-color color
              (format t ,format-summary
                      (length results)
                      (count nil results))))
-         (eq 0 (count nil results)))))
+         (zerop (count nil results)))))
 
   (defmacro suite (desc &rest results)
     "Describe a suite of tests."
