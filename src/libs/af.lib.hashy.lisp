@@ -43,7 +43,7 @@
 (defun stringify (symbol)
   "Convert a cl-json symbol back into original representation."
   (let* ((decoded (cl-json:encode-json-to-string `((,symbol . ""))))
-         (start-pos 2) ;; after the {"
+         (start-pos 2) ; after the {"
          (end-pos (position #\" (subseq decoded start-pos))))
     (subseq decoded start-pos (+ start-pos end-pos))))
 
