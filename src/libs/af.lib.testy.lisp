@@ -30,31 +30,27 @@
 (in-package #:af.lib.testy)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defmacro suite (desc &rest results)
+  (defmacro test-wrapper (format-title format-summary  desc &rest results)
     "Describe a suite of tests."
     `(progn
        (af.lib.ansi-colors:with-color :blue
-         (format t "~%~a~%" ,desc))
+         (format t ,format-title ,desc))
        (let ((results (list ,@results)))
          (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
            (with-color color
-             (format t "~%~a tests, ~a failures~%"
+             (format t ,format-summary
                      (length results)
                      (count nil results))))
          (eq 0 (count nil results)))))
 
+  (defmacro suite (desc &rest results)
+    "Describe a suite of tests."
+    `(test-wrapper "~%~a~%" "~%~a tests, ~a failures~%" ,desc ,@results))
+
   (defmacro desc (desc &rest results)
     "Describe a set of test."
-    `(progn
-       (af.lib.ansi-colors:with-color :cyan
-         (format t "~%  ~a~%~%" ,desc))
-       (let ((results (list ,@results)))
-         (let ((color (if (eq 0 (count nil results)) :light-green :light-red)))
-           (with-color color
-             (format t "~%  ~a assertions, ~a failures~%~%"
-                     (length results)
-                     (count nil results))))
-         (eq 0 (count nil results))))))
+    `(test-wrapper "~%~%  ~a~%~%" "~%  ~a assertions, ~a failures~%" ,desc ,@results))
+  ) ;; eval-when
 
 (defun it (desc result)
   "Assert the body evaluates as expected."
