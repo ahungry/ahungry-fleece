@@ -104,31 +104,31 @@
 - If TARGET is a pathname, will read in the file and decode.
 - If TARGET is a string, will decode the contents.
 - todo: If TARGET is a URI, will retrieve remote contents and decode."
-  (let (fn)
+  `(let (fn)
     (cond
       ;; Handle json pathname
-      ((and (equal :json type)
-            (pathnamep target))
+      ((and (equal :json ,type)
+            (pathnamep ,target))
        (setq fn 'hash-from-json-file))
 
       ;; Handle json strings
-      ((and (equal :json type)
-            (stringp target))
+      ((and (equal :json ,type)
+            (stringp ,target))
        (setq fn 'hash-from-json-string))
 
       ;; Handle yaml pathname
-      ((and (equal :yaml type)
-            (pathnamep target))
+      ((and (equal :yaml ,type)
+            (pathnamep ,target))
        (setq fn 'hash-from-yaml-file))
 
       ;; Handle yaml strings
-      ((and (equal :yaml type)
-            (stringp target))
+      ((and (equal :yaml ,type)
+            (stringp ,target))
        (setq fn 'hash-from-yaml-string))
 
-      (t (setq fn 'hash-from-yaml-file)))
+      (t (error "Unknown handler for with-hashy")))
 
-    `(let ((,hashy-sym (,fn ,target)))
+    (let ((,hashy-sym (funcall fn ,target)))
        (unwind-protect
             (progn ,@body)))))
 
