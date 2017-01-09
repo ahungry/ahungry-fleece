@@ -127,9 +127,9 @@ latter mode is generally easier to read."
                 (setf (gethash "branch" json-file-coverage) json-branch-coverage)
 
                 (push json-file-coverage (gethash directory-node json))
-             ))
+                ))
         (format stream (dump json))
-      ))))
+        ))))
 
 (defun report-cli (directory)
   "Print a code coverage report of all instrumented files into DIRECTORY.
@@ -164,40 +164,40 @@ latter mode is generally easier to read."
                            paths)))))
              *code-coverage-info*)
     (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
-        ;;(sb-cover::write-styles t)
-        (unless paths
-          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
-          (format t "<h3>No code coverage data found.</h3>")
-          (return-from report-cli))
+      ;;(sb-cover::write-styles t)
+      (unless paths
+        (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+        (format t "<h3>No code coverage data found.</h3>")
+        (return-from report-cli))
 
-        ;; @todo Get format under 80 char width
-        (format t "                                        EXPRESSION                          BRANCH~%")
-        (format t "----------------------------------------------------------------------------------------------------~%")
-        (format t "Source File                    ~{~12A~}~%"
-                (list
-                 "Covered" "Total" "      %"
-                 "Covered" "Total" "      %"))
-        (format t "----------------------------------------------------------------------------------------------------~%")
-        (setf paths (sort paths #'string< :key #'car))
-        (loop for prev = nil then source-file
-           for (source-file report-file expression branch) in paths
-           for even = nil then (not even)
-           do (when (or (null prev)
-                        (not (equal (pathname-directory (pathname source-file))
-                                    (pathname-directory (pathname prev)))))
-                (format t "~%~%~A"
-                        (namestring (make-pathname :directory (pathname-directory (pathname source-file)))))
-                )
-           do (format t "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
-                      (enough-namestring (pathname source-file)
-                                         (pathname source-file))
-                      (list (sb-cover::ok-of expression)
-                            (sb-cover::all-of expression)
-                            (sb-cover::percent expression)
-                            (sb-cover::ok-of branch)
-                            (sb-cover::all-of branch)
-                            (sb-cover::percent branch))))
-        (format t "~%~%")
+      ;; @todo Get format under 80 char width
+      (format t "                                        EXPRESSION                          BRANCH~%")
+      (format t "----------------------------------------------------------------------------------------------------~%")
+      (format t "Source File                    ~{~12A~}~%"
+              (list
+               "Covered" "Total" "      %"
+               "Covered" "Total" "      %"))
+      (format t "----------------------------------------------------------------------------------------------------~%")
+      (setf paths (sort paths #'string< :key #'car))
+      (loop for prev = nil then source-file
+         for (source-file report-file expression branch) in paths
+         for even = nil then (not even)
+         do (when (or (null prev)
+                      (not (equal (pathname-directory (pathname source-file))
+                                  (pathname-directory (pathname prev)))))
+              (format t "~%~%~A"
+                      (namestring (make-pathname :directory (pathname-directory (pathname source-file)))))
+              )
+         do (format t "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
+                    (enough-namestring (pathname source-file)
+                                       (pathname source-file))
+                    (list (sb-cover::ok-of expression)
+                          (sb-cover::all-of expression)
+                          (sb-cover::percent expression)
+                          (sb-cover::ok-of branch)
+                          (sb-cover::all-of branch)
+                          (sb-cover::percent branch))))
+      (format t "~%~%")
       report-file)))
 
 ;; Newly contributed GPLv3 code goes down here

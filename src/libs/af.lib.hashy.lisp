@@ -105,34 +105,34 @@
 - todo: If TARGET is a URI, will retrieve remote contents and decode."
   `(progn
      (let (fn)
-     ,(cond
-        ;; Handle json pathname
-        ((and (eq :json type)
-              (pathnamep target))
-         `(progn
-            (setf fn #'hash-from-json-file)))
+       ,(cond
+          ;; Handle json pathname
+          ((and (eq :json type)
+                (pathnamep target))
+           `(progn
+              (setf fn #'hash-from-json-file)))
 
-        ;; Handle json strings
-        ((and (eq :json type)
-              (stringp target))
-         `(progn
-            (setf fn #'hash-from-json-string)))
+          ;; Handle json strings
+          ((and (eq :json type)
+                (stringp target))
+           `(progn
+              (setf fn #'hash-from-json-string)))
 
-        ;; Handle yaml pathname
-        ((and (eq :yaml type)
-              (pathnamep target))
-         `(progn
-            (setf fn #'hash-from-yaml-file)))
+          ;; Handle yaml pathname
+          ((and (eq :yaml type)
+                (pathnamep target))
+           `(progn
+              (setf fn #'hash-from-yaml-file)))
 
-        ;; Handle yaml strings
-        ((and (eq :yaml type)
-              (stringp target))
-         `(progn
-            (setf fn #'hash-from-yaml-string)))
+          ;; Handle yaml strings
+          ((and (eq :yaml type)
+                (stringp target))
+           `(progn
+              (setf fn #'hash-from-yaml-string)))
 
-        )
-     (let ((hashy (funcall fn ,target)))
-       ,@body))))
+          )
+       (let ((hashy (funcall fn ,target)))
+         ,@body))))
 
 (defun dump (object)
   "Return the object as json."

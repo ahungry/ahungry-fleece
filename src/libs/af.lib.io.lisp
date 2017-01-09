@@ -74,12 +74,12 @@ If the file exists, will append to the file.
 If the file does not exist, will create it."
   (let ((lines (split-sequence:split-sequence #\Newline content)))
     (ensure-directories-exist filename)
-         (with-open-file
-             (stream filename
-                     :direction :output
-                     :if-exists (if overwrite :supersede :append)
-                     :if-does-not-exist :create)
-           (loop for line in lines
-                do (write-line line stream )))))
+    (with-open-file
+        (stream filename
+                :direction :output
+                :if-exists (if overwrite :supersede :append)
+                :if-does-not-exist :create)
+      (loop for line in lines
+         do (write-line line stream )))))
 
 ;;; "af.lib.io" goes here. Hacks and glory await!
