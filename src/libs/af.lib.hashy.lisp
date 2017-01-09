@@ -27,6 +27,7 @@
         :af.lib.io)
   (:export
    :alist-to-hash
+   :hashy
    :dump
    :hash-from-json-file
    :hash-from-json-string
@@ -97,42 +98,39 @@
   "Read in FILENAME and create a hash."
   (hash-from-yaml-string (file-get-contents filename)))
 
-(defmacro with-hashy ((target &key (type :json)) &body body)
+(defmacro with-hashy ((hashy-sym target &key (type :json)) &body body)
   "Create and bind to HASHY object (hash-table) from the TARGET.
 
 - If TARGET is a pathname, will read in the file and decode.
 - If TARGET is a string, will decode the contents.
 - todo: If TARGET is a URI, will retrieve remote contents and decode."
-  `(progn
-     (let (fn)
-       ,(cond
-          ;; Handle json pathname
-          ((and (eq :json type)
-                (pathnamep target))
-           `(progn
-              (setf fn #'hash-from-json-file)))
+  (let (fn)
+    (cond
+      ;; Handle json pathname
+      ((and (equal :json type)
+            (pathnamep target))
+       (setq fn 'hash-from-json-file))
 
-          ;; Handle json strings
-          ((and (eq :json type)
-                (stringp target))
-           `(progn
-              (setf fn #'hash-from-json-string)))
+      ;; Handle json strings
+      ((and (equal :json type)
+            (stringp target))
+       (setq fn 'hash-from-json-string))
 
-          ;; Handle yaml pathname
-          ((and (eq :yaml type)
-                (pathnamep target))
-           `(progn
-              (setf fn #'hash-from-yaml-file)))
+      ;; Handle yaml pathname
+      ((and (equal :yaml type)
+            (pathnamep target))
+       (setq fn 'hash-from-yaml-file))
 
-          ;; Handle yaml strings
-          ((and (eq :yaml type)
-                (stringp target))
-           `(progn
-              (setf fn #'hash-from-yaml-string)))
+      ;; Handle yaml strings
+      ((and (equal :yaml type)
+            (stringp target))
+       (setq fn 'hash-from-yaml-string))
 
-          )
-       (let ((hashy (funcall fn ,target)))
-         ,@body))))
+      (t (setq fn 'hash-from-yaml-file)))
+
+    `(let ((,hashy-sym (,fn ,target)))
+       (unwind-protect
+            (progn ,@body)))))
 
 (defun dump (object)
   "Return the object as json."

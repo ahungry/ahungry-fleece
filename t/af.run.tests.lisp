@@ -125,6 +125,27 @@
               ))
         )
 
+       (desc
+        "af.lib.hashy:with-hashy"
+
+        (it "Should bind inline JSON to hashy"
+            (af.lib.hashy:with-hashy
+                (hashy "[1, 2, 3]" :type :json)
+              (equal '(1 2 3) hashy))
+            )
+
+        (it "Should bind a YAML TARGET to the hashy variable"
+            (progn
+              (let ((pathname
+                     (pathname (format nil "~a/t/fixtures/pets.yml"
+                                       (asdf:system-source-directory :ahungry-fleece)))))
+              (af.lib.hashy:with-hashy
+                  (hashy pathname :type :yaml)
+                  (and
+                   (equal "petType" (ref "#/definitions/Pet/discriminator" hashy)))
+                  )))
+            ) ; it
+        ) ; desc
        ) ;; end suite
       (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
       (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1)))))
