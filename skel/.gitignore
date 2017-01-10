@@ -8,5 +8,6 @@
 /configure
 /Makefile
 /bin/skeleton
+/bin/skeleton-test
 /bin/skeleton.core
 /coverage/

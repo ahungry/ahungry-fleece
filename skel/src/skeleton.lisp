@@ -20,12 +20,31 @@
 
 (defpackage skeleton
   (:use :cl)
-  (:export :main))
+  (:export :main
+           :print-usage))
 
 (in-package #:skeleton)
 
-(defun main ()
-  "Well...guess we can print the version here."
-  (print "0.0.1"))
+(defun print-usage ()
+  (format t
+   "skeleton v/~a.
+
+Usage:
+
+    $ skeleton [-h, --help] # Print this help
+
+"
+   (asdf:component-version (asdf:find-system :skeleton))))
+
+(defun main (&rest argv)
+  (unless argv
+    (setf argv sb-ext:*posix-argv*))
+
+  (if (or (equal (first argv) "-h")
+          (equal (first argv) "--help"))
+      (print-usage)
+
+      (cond
+        (t (print-usage)))))
 
 ;;; "skeleton" goes here. Hacks and glory await!

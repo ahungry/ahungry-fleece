@@ -53,7 +53,10 @@ directory structure setup (with CLI based unit test etc.)."
    "ahungry-fleece v/~a.
 
 Usage:
+
+    $ ahungry-fleece [-h, --help] # Print this help
     $ ahungry-fleece make-skelly-project /path/to/directory # Make a skeleton project
+
 "
    (asdf:component-version (asdf:find-system :ahungry-fleece))))
 
