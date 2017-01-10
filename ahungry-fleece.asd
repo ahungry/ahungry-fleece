@@ -28,16 +28,55 @@
   :description "A general utility library of convenience functions and features."
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
-  :depends-on (#+sbcl #:sb-cover
-               #:cl-json
+  :depends-on (#:cl-json
                #:cl-yaml
                #:md5
                #:split-sequence)
   :serial t
   :components
   (
+   ;; Contrib module from SBCL source (Public Domain)
+   (:module "compiler"
+            :pathname "contrib/sb-rotate-byte"
+            :components
+            ((:file "package")
+             (:file "compiler" :depends-on ("package"))))
+
+   ;; Contrib module from SBCL source (Public Domain)
+   (:module "vm"
+            :depends-on ("compiler")
+            :pathname "contrib/sb-rotate-byte"
+            :components
+            ((:file "arm-vm" :if-feature :arm)
+             (:file "arm64-vm" :if-feature :arm64)
+             (:file "x86-vm" :if-feature :x86)
+             (:file "x86-64-vm" :if-feature :x86-64)
+             (:file "ppc-vm" :if-feature :ppc)))
+
+   ;; Contrib module from SBCL source (Public Domain)
+   (:module "sb-rotate-byte"
+            :depends-on ("vm")
+            :pathname "contrib/sb-rotate-byte"
+            :components
+            ((:file "rotate-byte")))
+
+   ;; Contrib module from SBCL source (Public Domain)
+   (:module "sb-md5"
+            :depends-on ("sb-rotate-byte")
+            :pathname "contrib/sb-md5"
+            :components
+            ((:file "md5")))
+
+   ;; Contrib module from SBCL source (Public Domain)
+   (:module "sb-cover"
+            :depends-on ("sb-md5")
+            :pathname "contrib/sb-cover"
+            :components
+            ((:file "cover")))
+
    ;; The lib modules
    (:module "libs"
+            :depends-on ("sb-cover")
             :pathname "src/libs"
             :components
             ((:file "af.lib.coverage"
