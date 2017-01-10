@@ -62,7 +62,7 @@ Usage:
 
 (defun main (&rest argv)
   (unless argv
-    (setf argv sb-ext:*posix-argv*))
+    (setf argv (cdr sb-ext:*posix-argv*)))
 
   (if (or (equal (first argv) "-h")
           (equal (first argv) "--help"))
