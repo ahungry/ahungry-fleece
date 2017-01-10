@@ -28,7 +28,8 @@
   :description "A general utility library of convenience functions and features."
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
-  :depends-on (#:cl-json
+  :depends-on (#+sbcl #:sb-cover
+               #:cl-json
                #:cl-yaml
                #:md5
                #:split-sequence)
@@ -40,7 +41,9 @@
             :pathname "src/libs"
             :components
             ((:file "af.lib.coverage"
-                    :depends-on ("af.lib.hashy"))
+                    :depends-on ("af.lib.hashy"
+                                 "af.lib.ansi-colors"
+                                 ))
              (:file "af.lib.hashy"
                     :depends-on ("af.lib.loggy"
                                  "af.lib.io"))

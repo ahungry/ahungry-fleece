@@ -34,6 +34,7 @@
   (:use :cl
         :sb-c
         :sb-cover
+        :af.lib.ansi-colors
         :af.lib.io
         :af.lib.hashy)
   (:export :report-cli
