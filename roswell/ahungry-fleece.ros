@@ -26,14 +26,14 @@ Usage:
    (asdf:component-version (asdf:find-system :ahungry-fleece))))
 
 (defun main (&rest argv)
-  (when (or (equal (first argv) "-h")
-            (equal (first argv) "--help"))
-    (print-usage))
+  (if (or (equal (first argv) "-h")
+          (equal (first argv) "--help"))
+      (print-usage)
 
-  (cond
-    ((equal "make-skelly-project" (first argv))
-     (make-skelly-project (second argv)))
+      (cond
+        ((equal "make-skelly-project" (first argv))
+         (make-skelly-project (second argv)))
 
-    (t (print-usage))))
+        (t (print-usage)))))
 
 ;;; vim: set ft=lisp lisp:
