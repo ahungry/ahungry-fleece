@@ -25,6 +25,7 @@ rapid development in one of the greatest languages around (Lisp!)
 
 # Setup
 ## Installation
+### Quicklisp/REPL
 Currently the library is not on quicklisp (yet), so you'll have to add
 to your local proejcts directory after cloning it, as such:
 
@@ -39,6 +40,20 @@ git clone https://github.com/ahungry/ahungry-fleece
 ;; Optionally confirm all is working by running the tests
 (af.lib.test:main)
 ```
+
+### Roswell
+Simply run:
+```sh
+ros install ahungry/ahungry-fleece
+```
+
+Then you can use it in your roswell image, or run the CLI scripts
+directly via:
+
+```
+~/.roswell/bin/ahungry-fleece -h
+```
+
 
 # Usage
 ## IO
