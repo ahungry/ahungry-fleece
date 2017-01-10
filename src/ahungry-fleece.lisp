@@ -26,6 +26,7 @@
         :af.lib.hashy)
   (:export :main
            :make-skelly-project
+           :print-usage
            ))
 
 (in-package #:ahungry-fleece)
@@ -47,8 +48,27 @@ directory structure setup (with CLI based unit test etc.)."
   (pushnew (truename directory) asdf:*central-registry* :test 'equal)
   (file-get-contents (merge-pathnames "README.md" (truename directory))))
 
-(defun main ()
-  "Well...guess we can print the version here."
-  (print "0.2.0"))
+(defun print-usage ()
+  (format t
+   "ahungry-fleece v/~a.
+
+Usage:
+    $ ahungry-fleece make-skelly-project /path/to/directory # Make a skeleton project
+"
+   (asdf:component-version (asdf:find-system :ahungry-fleece))))
+
+(defun main (&rest argv)
+  (unless argv
+    (setf argv sb-ext:*posix-argv*))
+
+  (if (or (equal (first argv) "-h")
+          (equal (first argv) "--help"))
+      (print-usage)
+
+      (cond
+        ((equal "make-skelly-project" (first argv))
+         (make-skelly-project (second argv)))
+
+        (t (print-usage)))))
 
 ;;; "ahungry-fleece" goes here. Hacks and glory await!

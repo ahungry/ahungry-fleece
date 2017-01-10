@@ -8,5 +8,6 @@
 /configure
 /Makefile
 /bin/ahungry-fleece
+/bin/ahungry-fleece-test
 /bin/ahungry-fleece.core
 /coverage/

@@ -9,12 +9,17 @@ CFLAGS = --disable-debugger \
 	--eval "(mapc \#'require '(sb-bsd-sockets sb-posix sb-introspect sb-cltl2 sb-rotate-byte sb-cover asdf))" \
 	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece.core")'
 
+TEFLAGS = --disable-debugger \
+	--eval '(ql:quickload :ahungry-fleece)' \
+	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece-test" :executable t)'
+
 EFLAGS = --disable-debugger \
 	--eval '(ql:quickload :ahungry-fleece)' \
-	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece" :executable t)'
+	--eval '(sb-ext:save-lisp-and-die "bin/ahungry-fleece" :executable t :toplevel '"\#'ahungry-fleece::main)"
 
 CORE = bin/ahungry-fleece.core
 EXE = bin/ahungry-fleece
+TEXE = bin/ahungry-fleece-test
 
 all: $(EXE)
 
@@ -24,7 +29,10 @@ $(CORE):
 $(EXE): $(CORE)
 	$(LISP) --core $< $(EFLAGS)
 
-test: $(EXE)
+$(TEXE): $(CORE)
+	$(LISP) --core $< $(TEFLAGS)
+
+test: $(TEXE)
 	AF_LIB_TESTY_COLORIZE=$(AF_LIB_TESTY_COLORIZE) $< $(TFLAGS)
 
 coverage: $(EXE)
@@ -34,6 +42,7 @@ coverage: $(EXE)
 clean:
 	-rm $(CORE)
 	-rm $(EXE)
+	-rm $(TEXE)
 
 .PHONY:
 	all test

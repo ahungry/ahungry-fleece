@@ -12,28 +12,10 @@ exec ros -Q -L sbcl-bin -- $0 "$@"
 (defpackage #:ros.script.ahungry-fleece
   (:use #:cl)
   (:import-from #:ahungry-fleece
-                #:make-skelly-project))
+                #:main))
 
 (in-package :ros.script.ahungry-fleece)
 
-(defun print-usage ()
-  (format t
-   "ahungry-fleece v/~a.
-
-Usage:
-    $ ahungry-fleece make-skelly-project /path/to/directory # Make a skeleton project
-"
-   (asdf:component-version (asdf:find-system :ahungry-fleece))))
-
-(defun main (&rest argv)
-  (if (or (equal (first argv) "-h")
-          (equal (first argv) "--help"))
-      (print-usage)
-
-      (cond
-        ((equal "make-skelly-project" (first argv))
-         (make-skelly-project (second argv)))
-
-        (t (print-usage)))))
+(main argv)
 
 ;;; vim: set ft=lisp lisp:
