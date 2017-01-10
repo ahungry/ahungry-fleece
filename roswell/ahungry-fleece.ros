@@ -10,12 +10,11 @@ exec ros -Q -L sbcl-bin -- $0 "$@"
   (ql:quickload '(#:ahungry-fleece) :silent t))
 
 (defpackage #:ros.script.ahungry-fleece
-  (:use #:cl)
-  (:import-from #:ahungry-fleece
-                #:main))
+  (:use #:cl))
 
 (in-package :ros.script.ahungry-fleece)
 
-(main argv)
+(defun main (&rest argv)
+  (ahungry-fleece:main argv))
 
 ;;; vim: set ft=lisp lisp:
