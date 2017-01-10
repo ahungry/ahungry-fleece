@@ -24,7 +24,7 @@
 (in-package :ahungry-fleece-asd)
 
 (asdf:defsystem #:ahungry-fleece
-  :version "0.2.0"
+  :version "0.3.0"
   :description "A general utility library of convenience functions and features."
   :author "Matthew Carter <m@ahungry.com>"
   :license "GPLv3"
