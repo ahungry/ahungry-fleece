@@ -36,15 +36,15 @@
   :components
   (
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "compiler"
+   (:module "af.contrib.compiler"
             :pathname "contrib/sb-rotate-byte"
             :components
             ((:file "package")
              (:file "compiler" :depends-on ("package"))))
 
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "vm"
-            :depends-on ("compiler")
+   (:module "af.contrib.vm"
+            :depends-on ("af.contrib.compiler")
             :pathname "contrib/sb-rotate-byte"
             :components
             ((:file "arm-vm" :if-feature :arm)
@@ -54,29 +54,29 @@
              (:file "ppc-vm" :if-feature :ppc)))
 
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "sb-rotate-byte"
-            :depends-on ("vm")
+   (:module "af.contrib.sb-rotate-byte"
+            :depends-on ("af.contrib.vm")
             :pathname "contrib/sb-rotate-byte"
             :components
             ((:file "rotate-byte")))
 
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "sb-md5"
-            :depends-on ("sb-rotate-byte")
+   (:module "af.contrib.sb-md5"
+            :depends-on ("af.contrib.sb-rotate-byte")
             :pathname "contrib/sb-md5"
             :components
             ((:file "md5")))
 
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "sb-cover"
-            :depends-on ("sb-md5")
+   (:module "af.contrib.sb-cover"
+            :depends-on ("af.contrib.sb-md5")
             :pathname "contrib/sb-cover"
             :components
             ((:file "cover")))
 
    ;; The lib modules
    (:module "libs"
-            :depends-on ("sb-cover")
+            :depends-on ("af.contrib.sb-cover")
             :pathname "src/libs"
             :components
             ((:file "af.lib.coverage"

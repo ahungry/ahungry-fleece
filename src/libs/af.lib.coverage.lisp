@@ -33,7 +33,7 @@
 (defpackage af.lib.coverage
   (:use :cl
         :sb-c
-        :sb-cover
+        :af.contrib.sb-cover
         :af.lib.ansi-colors
         :af.lib.io
         :af.lib.hashy)
@@ -56,7 +56,7 @@ it has the value :WHOLE the whole form will be annotated (the default).
 The former mode shows explicitly which forms were instrumented, while the
 latter mode is generally easier to read."
   (let* ((paths)
-         (directory (sb-cover::pathname-as-directory directory))
+         (directory (af.contrib.sb-cover::pathname-as-directory directory))
          (*default-pathname-defaults* (translate-logical-pathname directory)))
     (ensure-directories-exist *default-pathname-defaults*)
     (maphash (lambda (k v)
@@ -73,7 +73,7 @@ latter mode is generally easier to read."
                                            :direction :output
                                            :if-exists :supersede
                                            :if-does-not-exist :create)
-                     (push (list* k n (sb-cover::report-file k stream :default))
+                     (push (list* k n (af.contrib.sb-cover::report-file k stream :default))
                            paths)))))
              *code-coverage-info*)
     (let ((report-file (make-pathname :name "coverage" :type "json" :defaults directory))
@@ -82,9 +82,9 @@ latter mode is generally easier to read."
       (with-open-file (stream report-file
                               :direction :output :if-exists :supersede
                               :if-does-not-exist :create)
-        ;;(sb-cover::write-styles stream)
+        ;;(af.contrib.sb-cover::write-styles stream)
         (unless paths
-          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE AF.CONTRIB.SB-COVER:STORE-COVERAGE-DATA))?")
           (format stream "<h3>No code coverage data found.</h3>")
           (return-from report-json))
 
@@ -105,21 +105,21 @@ latter mode is generally easier to read."
 
                 ;; Now build the branches
                 (setf (gethash "covered" json-line-coverage)
-                      (sb-cover::ok-of expression))
+                      (af.contrib.sb-cover::ok-of expression))
                 (setf (gethash "total" json-line-coverage)
-                      (sb-cover::all-of expression))
+                      (af.contrib.sb-cover::all-of expression))
                 (setf (gethash "percent" json-line-coverage)
-                      (if (sb-cover::percent expression)
-                          (float (sb-cover::percent expression))
+                      (if (af.contrib.sb-cover::percent expression)
+                          (float (af.contrib.sb-cover::percent expression))
                           nil))
 
                 (setf (gethash "covered" json-branch-coverage)
-                      (sb-cover::ok-of branch))
+                      (af.contrib.sb-cover::ok-of branch))
                 (setf (gethash "total" json-branch-coverage)
-                      (sb-cover::all-of branch))
+                      (af.contrib.sb-cover::all-of branch))
                 (setf (gethash "percent" json-branch-coverage)
-                      (if (sb-cover::percent branch)
-                          (float (sb-cover::percent branch))
+                      (if (af.contrib.sb-cover::percent branch)
+                          (float (af.contrib.sb-cover::percent branch))
                           nil))
 
                 (setf (gethash "name" json-file-coverage)
@@ -144,7 +144,7 @@ it has the value :WHOLE the whole form will be annotated (the default).
 The former mode shows explicitly which forms were instrumented, while the
 latter mode is generally easier to read."
   (let* ((paths)
-         (directory (sb-cover::pathname-as-directory directory))
+         (directory (af.contrib.sb-cover::pathname-as-directory directory))
          (*default-pathname-defaults* (translate-logical-pathname directory)))
     (ensure-directories-exist *default-pathname-defaults*)
     (maphash (lambda (k v)
@@ -161,13 +161,13 @@ latter mode is generally easier to read."
                                            :direction :output
                                            :if-exists :supersede
                                            :if-does-not-exist :create)
-                     (push (list* k n (sb-cover::report-file k stream :default))
+                     (push (list* k n (af.contrib.sb-cover::report-file k stream :default))
                            paths)))))
              *code-coverage-info*)
     (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
-      ;;(sb-cover::write-styles t)
+      ;;(af.contrib.sb-cover::write-styles t)
       (unless paths
-        (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+        (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE AF.CONTRIB.SB-COVER:STORE-COVERAGE-DATA))?")
         (format t "<h3>No code coverage data found.</h3>")
         (return-from report-cli))
 
@@ -192,12 +192,12 @@ latter mode is generally easier to read."
          do (format t "~%    ~30a ~{~:[-~;~:*  ~8,a~] ~:[-~;~:*~8a~]~:[       -~;~:*~8,1f~]          ~}"
                     (enough-namestring (pathname source-file)
                                        (pathname source-file))
-                    (list (sb-cover::ok-of expression)
-                          (sb-cover::all-of expression)
-                          (sb-cover::percent expression)
-                          (sb-cover::ok-of branch)
-                          (sb-cover::all-of branch)
-                          (sb-cover::percent branch))))
+                    (list (af.contrib.sb-cover::ok-of expression)
+                          (af.contrib.sb-cover::all-of expression)
+                          (af.contrib.sb-cover::percent expression)
+                          (af.contrib.sb-cover::ok-of branch)
+                          (af.contrib.sb-cover::all-of branch)
+                          (af.contrib.sb-cover::percent branch))))
       (format t "~%~%")
       report-file)))
 
@@ -206,11 +206,11 @@ latter mode is generally easier to read."
   (defmacro with-coverage (package &rest body)
     "Run BODY with coverage enabled."
     `(progn
-       (declaim (optimize sb-cover:store-coverage-data))
+       (declaim (optimize af.contrib.sb-cover:store-coverage-data))
        (with-open-stream (*error-output* (make-broadcast-stream))
          (with-open-stream (*standard-output* (make-broadcast-stream))
            (asdf:oos 'asdf:load-op ,package :force t)
            ))
        ,@body
-       (declaim (optimize (sb-cover:store-coverage-data 0)))))
+       (declaim (optimize (af.contrib.sb-cover:store-coverage-data 0)))))
   )

@@ -31,7 +31,7 @@
 ;;;; authors assume no responsibility for the consequences of any use
 ;;;; of this software.
 
-(defpackage :SB-MD5 (:use :CL)
+(defpackage :af.contrib.sb-md5 (:use :CL)
   (:export
    ;; Low-Level types and functions
    #:md5-regs #:initial-md5-regs #:md5regs-digest
@@ -42,7 +42,7 @@
    ;; High-Level functions on sequences, streams and files
    #:md5sum-sequence #:md5sum-string #:md5sum-stream #:md5sum-file))
 
-(in-package :sb-md5)
+(in-package :af.contrib.sb-md5)
 
 ;;; Section 2:  Basic Datatypes
 

@@ -1,4 +1,4 @@
-(in-package "SB-ROTATE-BYTE")
+(in-package "af.contrib.sb-rotate-byte")
 
 (defknown rotate-byte (integer byte-specifier integer) integer
   (foldable flushable)

@@ -5,7 +5,7 @@
 ;;; routines from Swank. That code was written by Helmut Eller, and
 ;;; was placed under Public Domain
 
-(defpackage #:sb-cover
+(defpackage #:af.contrib.sb-cover
   (:use #:cl #:sb-c)
   (:export #:report
            #:reset-coverage #:clear-coverage
@@ -13,7 +13,7 @@
            #:save-coverage #:save-coverage-in-file
            #:store-coverage-data))
 
-(in-package #:sb-cover)
+(in-package #:af.contrib.sb-cover)
 
 (declaim (type (member :whole :car) *source-path-mode*))
 (defvar *source-path-mode* :whole)
@@ -66,7 +66,7 @@ file designated by PATHNAME."
                           :if-exists :supersede
                           :if-does-not-exist :create)
     (with-standard-io-syntax
-      (let ((*package* (find-package :sb-cover)))
+      (let ((*package* (find-package :af.contrib.sb-cover)))
         (write (save-coverage) :stream stream)))
     (values)))
 
@@ -75,7 +75,7 @@ file designated by PATHNAME."
 result to RESTORE-COVERAGE."
   (with-open-file (stream pathname :direction :input)
     (with-standard-io-syntax
-      (let ((*package* (find-package :sb-cover)))
+      (let ((*package* (find-package :af.contrib.sb-cover)))
         (restore-coverage (read stream))))
     (values)))
 
@@ -131,7 +131,7 @@ latter mode is generally easier to read."
                               :if-does-not-exist :create)
         (write-styles stream)
         (unless paths
-          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE AF.CONTRIB.SB-COVER:STORE-COVERAGE-DATA))?")
           (format stream "<h3>No code coverage data found.</h3>")
           (close stream)
           (return-from report))

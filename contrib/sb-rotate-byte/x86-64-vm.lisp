@@ -1,4 +1,4 @@
-(in-package "SB-ROTATE-BYTE")
+(in-package "af.contrib.sb-rotate-byte")
 
 
 ;;; 32-bit rotates

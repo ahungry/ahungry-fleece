@@ -1,4 +1,4 @@
-(in-package "SB-ROTATE-BYTE")
+(in-package "af.contrib.sb-rotate-byte")
 
 (define-vop (%32bit-rotate-byte/c)
   (:policy :fast-safe)

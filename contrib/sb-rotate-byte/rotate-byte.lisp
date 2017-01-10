@@ -1,4 +1,4 @@
-(in-package "SB-ROTATE-BYTE")
+(in-package "af.contrib.sb-rotate-byte")
 
 (defun rotate-byte (count bytespec integer)
   "Rotates a field of bits within INTEGER; specifically, returns an
