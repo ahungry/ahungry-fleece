@@ -1,0 +1,39 @@
+#!/bin/sh
+#|-*- mode:lisp -*-|#
+#| A utility library for Common Lisp dependant on SBCL
+exec ros -Q -L sbcl-bin -- $0 "$@"
+|#
+#-sbcl
+(error "ahungry-fleece requires SBCL. Make sure it is installed with `ros install sbcl' and use it with `ros use sbcl'.")
+
+(progn ;;init forms
+  (ql:quickload '(#:ahungry-fleece) :silent t))
+
+(defpackage #:ros.script.ahungry-fleece
+  (:use #:cl)
+  (:import-from #:ahungry-fleece
+                #:make-skelly-project))
+
+(in-package :ros.script.ahungry-fleece)
+
+(defun print-usage ()
+  (format t
+   "ahungry-fleece v/~a.
+
+Usage:
+    $ ahungry-fleece make-skelly-project /path/to/directory # Make a skeleton project
+"
+   (asdf:component-version (asdf:find-system :ahungry-fleece))))
+
+(defun main (&rest argv)
+  (when (or (equal (first argv) "-h")
+            (equal (first argv) "--help"))
+    (print-usage))
+
+  (cond
+    ((equal "make-skelly-project" (first argv))
+     (make-skelly-project (second argv)))
+
+    (t (print-usage))))
+
+;;; vim: set ft=lisp lisp:
