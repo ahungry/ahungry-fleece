@@ -159,7 +159,7 @@
     (terpri)
     (with-color :blue (format t "Summary of coverage:~%"))
     (with-open-stream (*error-output* (make-broadcast-stream))
-      (sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
+      (af.contrib.sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
 
     (with-open-stream (*error-output* (make-broadcast-stream))
       (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
