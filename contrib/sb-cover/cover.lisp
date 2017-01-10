@@ -112,7 +112,7 @@ latter mode is generally easier to read."
                (declare (ignore v))
                (let* ((pk (translate-logical-pathname k))
                       (n (format nil "~(~{~2,'0X~}~)"
-                                (coerce (sb-md5:md5sum-string
+                                (coerce (af.contrib.sb-md5:md5sum-string
                                          (sb-ext:native-namestring pk))
                                         'list)))
                       (path (make-pathname :name n :type "html" :defaults directory)))
