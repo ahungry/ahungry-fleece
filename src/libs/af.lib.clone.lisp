@@ -25,27 +25,45 @@
         :cl-json)
   (:export
    :clone-project
+   :rename-path
    ))
 
 (in-package #:af.lib.clone)
+
+(defun rename-path (from-path to-path file-name from-name to-name)
+  "Rename a file in a path, as such:
+
+Given a FILE-NAME /one/two/sub/three with a FROM-PATH of /one/two
+and a TO-PATH of /uno/dos/sub/, with a FROM-NAME three and TO-NAME tres,
+produce a path of /uno/dos/sub/tres.
+
+@todo Add test
+"
+  (let* ((file-segment (subseq (af.lib.io:pathname-to-string file-name)
+                               (1+ (length (af.lib.io:pathname-to-string from-path)))))
+         (file-renamed (cl-ppcre:regex-replace-all from-name file-segment to-name)))
+    (merge-pathnames file-renamed to-path)))
 
 (defun clone-project (from-path to-path from-name to-name)
   "Recursively copy FROM-PATH to TO-PATH, while replacing all
 occurences of FROM-NAME to TO-NAME."
   (let ((nodes (directory-tree from-path))
-        (from-path (format nil "~a/" from-path))
         (to-path (format nil "~a/" to-path)))
     (loop for node in nodes
        when (file-p node)
        collect
-         (progn
-           (let* ((in-content (file-get-contents node))
-                  (out-content (cl-ppcre:regex-replace-all from-name in-content to-name))
-                  (out-file (cl-ppcre:regex-replace-all from-name (format nil "~a" node) to-name))
-                  (out-file (merge-pathnames (subseq out-file (length from-path)) to-path)))
-             (file-put-contents out-file out-content :overwrite t)
-             out-file
-             )))
-    ))
+         (let ((out-file (rename-path from-path to-path node from-name to-name)))
+             (handler-case
+                 (let* ((in-content (file-get-contents node))
+                        (out-content (cl-ppcre:regex-replace-all from-name in-content to-name)))
+                   (file-put-contents out-file out-content :overwrite t)
+                   out-file)
+             (sb-int:stream-decoding-error ()
+               ;; UTF8 binary issue with characters most likely...
+               (progn
+                 (file-put-binary-contents out-file (file-get-binary-contents node) :overwrite t)
+                 out-file))
+             (error (err)
+               (print err)))))))
 
 ;;; "af.lib.clone" goes here. Hacks and glory await!

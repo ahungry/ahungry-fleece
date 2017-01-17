@@ -27,6 +27,9 @@
    :file-p
    :file-get-contents
    :file-put-contents
+   :file-get-binary-contents
+   :file-put-binary-contents
+   :pathname-to-string
    ))
 
 (in-package #:af.lib.io)
@@ -80,6 +83,43 @@ If the file does not exist, will create it."
                 :if-exists (if overwrite :supersede :append)
                 :if-does-not-exist :create)
       (loop for line in lines
-         do (write-line line stream )))))
+         do (write-line line stream)))))
+
+(defun file-get-binary-contents (filename)
+  "Read in FILENAME and return as a byte list."
+  (let ((bytes
+         (with-open-file
+             (stream filename
+                     :direction :input
+                     :if-does-not-exist :error
+                     :element-type '(unsigned-byte 8)
+                     :external-format :utf-8)
+           (when stream
+             (loop for byte = (read-byte stream nil 'eof)
+                until (eq byte 'eof)
+                collect byte)))))
+    bytes))
+
+(defun file-put-binary-contents (filename content &key (overwrite nil))
+  "Write to FILENAME the CONTENT bytes sent in.
+
+If the file exists, will append to the file.
+
+If the file does not exist, will create it."
+  (let ((bytes content))
+    (ensure-directories-exist filename)
+    (with-open-file
+        (stream filename
+                :direction :output
+                :if-exists (if overwrite :supersede :append)
+                :if-does-not-exist :create
+                :element-type '(unsigned-byte 8)
+                :external-format :utf-8)
+      (loop for byte in bytes
+         do (write-byte byte stream)))))
+
+(defun pathname-to-string (pathname)
+  "Change PATHNAME into a string. @todo Add test"
+  (format nil "~a" pathname))
 
 ;;; "af.lib.io" goes here. Hacks and glory await!
