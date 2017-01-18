@@ -122,4 +122,28 @@ If the file does not exist, will create it."
   "Change PATHNAME into a string. @todo Add test"
   (format nil "~a" pathname))
 
+(defun directory-structure-helper (directory)
+  "List the directories (recursively)."
+  (let ((dirs (directory (format nil "~a/*/" directory))))
+    ;; Recursively grab the directories
+    (loop for dir in dirs
+       do (setq dirs (append dirs (directory-structure dir))))
+    dirs))
+
+(defun directory-structure (directory)
+  "Directory structure (including the root dir)."
+  (append (list (pathname directory)) (directory-structure-helper directory)))
+
+(defun find-file (path name)
+  "get all files matching a portion of name. @todo use threading here"
+  (let ((dirs (directory-structure path))
+        (matches '()))
+    (loop for dir in dirs
+       for files = (append (directory (format nil "~a/*.*" dir))
+                           (directory (format nil "~a/*" dir)))
+       do (loop for file in files
+             when (search name (pathname-to-string file))
+             do (push file matches)))
+    matches))
+
 ;;; "af.lib.io" goes here. Hacks and glory await!
