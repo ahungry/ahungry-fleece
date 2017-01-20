@@ -23,14 +23,17 @@
         :cl-json)
   (:export
    :directory-p
+   :directory-structure
    :directory-tree
    :file-p
    :file-get-contents
    :file-put-contents
    :file-get-binary-contents
    :file-put-binary-contents
-   :pathname-to-string
-   ))
+   :file-replace-strings
+   :find-file
+   :find-file-matches
+   :pathname-to-string))
 
 (in-package #:af.lib.io)
 
@@ -83,7 +86,8 @@ If the file does not exist, will create it."
                 :if-exists (if overwrite :supersede :append)
                 :if-does-not-exist :create)
       (loop for line in lines
-         do (write-line line stream)))))
+         do (write-line line stream))))
+  t)
 
 (defun file-get-binary-contents (filename)
   "Read in FILENAME and return as a byte list."
@@ -134,16 +138,52 @@ If the file does not exist, will create it."
   "Directory structure (including the root dir)."
   (append (list (pathname directory)) (directory-structure-helper directory)))
 
-(defun find-file (path name)
-  "get all files matching a portion of name. @todo use threading here"
+(defun find-file (path file-name)
+  "Get all files matching a portion of FILE-NAME. @todo use threading here"
   (let ((dirs (directory-structure path))
         (matches '()))
     (loop for dir in dirs
        for files = (append (directory (format nil "~a/*.*" dir))
                            (directory (format nil "~a/*" dir)))
        do (loop for file in files
-             when (search name (pathname-to-string file))
+             when (search file-name (pathname-to-string file))
              do (push file matches)))
     matches))
+
+(defun find-file-matches (path text &optional (file-name ""))
+  "Recursively find all files in PATH with FILE-NAME matches that contain
+TEXT."
+  (loop for file in (find-file path file-name)
+     when (progn
+            ;; For optimization, things we can't open (directories etc.)
+            ;; will just be passed over via handler case.  This is less
+            ;; expensive than doing a file/directory check on each one prior
+            ;; to getting contents.
+            (handler-case
+                (search text (file-get-contents file))
+              (error () nil)))
+     collect file))
+
+(defun file-replace-strings (file-name regex-list)
+  "Iterate across REGEX-LIST, which should be an alist, replacing
+each occurence of car with cdr.
+
+For instance, calling as such:
+
+  (file-replace-strings '((\"dog\" . \"cat\") (\"rules\" . \"rocks\")))
+
+to change a file containing text such as:
+
+  \"The dog rules\" to \"The cat rocks\"
+
+This will replace the content inline.
+
+Note that the car is a cl-ppcre compatible regex expression, and the
+cdr is a cl-ppcre compatible replacement string."
+  (let ((content (file-get-contents file-name)))
+    (loop for cons in regex-list
+       do (progn
+            (setq content (cl-ppcre:regex-replace-all (car cons) content (cdr cons)))))
+    (file-put-contents file-name content :overwrite t)))
 
 ;;; "af.lib.io" goes here. Hacks and glory await!
