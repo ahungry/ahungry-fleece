@@ -146,7 +146,7 @@ If the file does not exist, will create it."
        for files = (append (directory (format nil "~a/*.*" dir))
                            (directory (format nil "~a/*" dir)))
        do (loop for file in files
-             when (search file-name (pathname-to-string file))
+             when (cl-ppcre:scan file-name (pathname-to-string file))
              do (push file matches)))
     matches))
 
