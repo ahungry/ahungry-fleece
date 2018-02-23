@@ -31,6 +31,8 @@
   :depends-on (#:cl-json
                #:cl-yaml
                #:md5
+               #:chipz
+               #:archive
                #:split-sequence)
   :serial t
   :components
