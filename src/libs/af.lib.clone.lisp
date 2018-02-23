@@ -53,11 +53,11 @@ occurences of FROM-NAME to TO-NAME."
        when (file-p node)
        collect
          (let ((out-file (rename-path from-path to-path node from-name to-name)))
-             (handler-case
-                 (let* ((in-content (file-get-contents node))
-                        (out-content (cl-ppcre:regex-replace-all from-name in-content to-name)))
-                   (file-put-contents out-file out-content :overwrite t)
-                   out-file)
+           (handler-case
+               (let* ((in-content (file-get-contents node))
+                      (out-content (cl-ppcre:regex-replace-all from-name in-content to-name)))
+                 (file-put-contents out-file out-content :overwrite t)
+                 out-file)
              (sb-int:stream-decoding-error ()
                ;; UTF8 binary issue with characters most likely...
                (progn

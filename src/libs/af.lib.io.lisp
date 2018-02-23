@@ -186,4 +186,19 @@ cdr is a cl-ppcre compatible replacement string."
             (setq content (cl-ppcre:regex-replace-all (car cons) content (cdr cons)))))
     (file-put-contents file-name content :overwrite t)))
 
+(defun extract-tarball (pathname)
+  "Extract a tarball (.tar.gz) file to a directory (*default-pathname-defaults*).
+
+TODO: Put in fleece"
+  (handler-case
+      (with-open-file (tarball-stream pathname
+                                      :direction :input
+                                      :element-type '(unsigned-byte 8))
+        (archive::extract-files-from-archive
+         (archive:open-archive 'archive:tar-archive
+                               (chipz:make-decompressing-stream 'chipz:gzip tarball-stream)
+                               :direction :input)))
+    ;; Extended tar headers can bork this.  TODO: Maybe call CLI untar.
+    (archive:unhandled-read-header-error () nil)))
+
 ;;; "af.lib.io" goes here. Hacks and glory await!
