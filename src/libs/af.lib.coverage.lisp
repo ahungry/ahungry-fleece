@@ -209,7 +209,8 @@ latter mode is generally easier to read."
        (declaim (optimize af.contrib.sb-cover:store-coverage-data))
        (with-open-stream (*error-output* (make-broadcast-stream))
          (with-open-stream (*standard-output* (make-broadcast-stream))
-           (asdf:oos 'asdf:load-op ,package :force t)
+           ;; (asdf:oos 'asdf:load-op ,package :force t)
+           (print "Well, this would be a load, but whatever...")
            ))
        ,@body
        (declaim (optimize (af.contrib.sb-cover:store-coverage-data 0)))))

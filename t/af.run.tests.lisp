@@ -161,13 +161,13 @@
     (with-open-stream (*error-output* (make-broadcast-stream))
       (af.contrib.sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
 
-    (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
-      )
+    ;; (with-open-stream (*error-output* (make-broadcast-stream))
+    ;;   (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
+    ;;   )
 
-    (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-json (merge-pathnames #P"coverage/" *base-directory*))
-      )
+    ;; (with-open-stream (*error-output* (make-broadcast-stream))
+    ;;   (af.lib.coverage:report-json (merge-pathnames #P"coverage/" *base-directory*))
+    ;;   )
 
     (with-color :light-blue
       (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"coverage/" *base-directory*))

@@ -8,12 +8,46 @@
 (defpackage #:af.contrib.sb-cover
   (:use #:cl #:sb-c)
   (:export #:report
+           #:get-coverage
            #:reset-coverage #:clear-coverage
            #:restore-coverage #:restore-coverage-from-file
            #:save-coverage #:save-coverage-in-file
            #:store-coverage-data))
 
 (in-package #:af.contrib.sb-cover)
+
+(defmacro code-coverage-hashtable () `(car sb-c:*code-coverage-info*))
+
+;;;; New coverage representation (only for x86-64 as of now).
+;;;; One byte per coverage mark is stored in the unboxed constants of the code.
+(defun %find-coverage-map (code)
+  (declare (type (or sb-kernel:simple-fun
+                     sb-kernel:code-component
+                     symbol)
+                 code))
+  (etypecase code
+   (sb-kernel:simple-fun
+    (%find-coverage-map (sb-kernel:fun-code-header code)))
+   (symbol
+    (%find-coverage-map (or (macro-function code) (fdefinition code))))
+   (sb-kernel:code-component
+    (let ((n (sb-kernel:code-header-words code)))
+      (let ((map (sb-kernel:code-header-ref code (1- n))))
+        (when (typep map '(cons (eql sb-c::coverage-map)))
+          (return-from %find-coverage-map (values (cdr map) code))))))))
+
+;;; Retun just the list of soure paths in CODE that are marked covered.
+(defun get-coverage (code)
+  (multiple-value-bind (map code) (%find-coverage-map code)
+    (when map
+      (sb-int:collect ((paths))
+        (sb-sys:with-pinned-objects (code)
+          (let ((sap (sb-kernel:code-instructions code)))
+            (dotimes (i (length map) (paths))
+              (unless (zerop (sb-sys:sap-ref-8 sap i))
+                (paths (svref map i))))))))))
+
+;;;;
 
 (declaim (type (member :whole :car) *source-path-mode*))
 (defvar *source-path-mode* :whole)
@@ -28,11 +62,82 @@
 into the database when the FASL files (produced by compiling
 STORE-COVERAGE-DATA optimization policy set to 3) are loaded again into the
 image."
-  (sb-c::clear-code-coverage))
+  (sb-c:clear-code-coverage))
 
-(defun reset-coverage ()
+(macrolet
+    ((do-instrumented-code ((var &optional result) &body body)
+       ;; Scan list of weak-pointers to all coverage-instrumented code,
+       ;; binding VAR to each object, and removing broken weak-pointers.
+       `(let ((predecessor sb-c:*code-coverage-info*))
+          (loop
+           (let ((cell (cdr predecessor)))
+             (unless cell (return ,result))
+             (let ((,var (sb-ext:weak-pointer-value (car cell))))
+               (if ,var
+                   (progn ,@body (setq predecessor cell))
+                   (rplacd predecessor (cdr cell)))))))))
+
+(defun reset-coverage (&optional object)
   "Reset all coverage data back to the `Not executed` state."
-  (sb-c::reset-code-coverage))
+  (cond (object ; reset only this object
+         (multiple-value-bind (map code) (%find-coverage-map object)
+           (when map
+             (let ((header-length (sb-kernel:code-header-words code)))
+               (dotimes (i (ceiling (length map) sb-vm:n-word-bytes))
+                 (setf (sb-kernel:code-header-ref code (+ header-length i))
+                       0))))))
+        (t ; reset everything
+         (do-instrumented-code (code)
+           (reset-coverage code))
+         (sb-c:reset-code-coverage))))
+
+;;; Transfer data from new-style coverage marks into old-style.
+;;; Update only data for FILENAME if supplied, or all files if NIL.
+;;; Ideally we could report directly from the new data where applicable,
+;;; however this is, for the time being, perfectly backward-compatibile.
+(defun refresh-coverage-info (&optional filename)
+  ;; NAMESTRING->PATH-TABLES maps a namestring to a hashtable which maps
+  ;; source paths to the legacy coverage record for that path in that file,
+  ;;   e.g. (1 4 1) -> ((1 4 1) . SB-C::%CODE-COVERAGE-UNMARKED%)
+  #+(or x86-64 x86)
+  (let ((namestring->path-tables (make-hash-table :test 'equal))
+        (coverage-records (code-coverage-hashtable))
+        (n-marks 0))
+    (do-instrumented-code (code)
+      (sb-int:binding* ((map (%find-coverage-map code) :exit-if-null)
+                        (namestring
+                         (sb-c::debug-source-namestring
+                          (sb-c::debug-info-source (sb-kernel:%code-debug-info code)))
+                         :exit-if-null)
+                        (legacy-coverage-marks
+                         (and (or (null filename) (string= namestring filename))
+                              (gethash namestring coverage-records))
+                         :exit-if-null)
+                        (path-lookup-table
+                         (gethash namestring namestring->path-tables)))
+        ;; Build the source path -> marked map for this file if not seen yet.
+        ;; It is of course redundant to have both representations.
+        (unless path-lookup-table
+          (setf path-lookup-table (make-hash-table :test 'equal)
+                (gethash namestring namestring->path-tables) path-lookup-table)
+          (dolist (item legacy-coverage-marks)
+            (setf (gethash (car item) path-lookup-table) item)))
+        (sb-sys:with-pinned-objects (code)
+          (let ((sap (sb-kernel:code-instructions code)))
+            (dotimes (i (length map)) ; for each recorded mark
+              (unless (zerop (sb-sys:sap-ref-8 sap i))
+                (incf n-marks)
+                ;; Set the legacy coverage mark for each path it touches
+                (dolist (path (svref map i))
+                  (let ((found (gethash path path-lookup-table)))
+                    (if found
+                        (rplacd found t)
+                        #+nil
+                        (warn "Missing coverage entry for ~S in ~S"
+                              path namestring))))))))))
+    (values coverage-records n-marks)))
+
+) ; end MACROLET
 
 (defun save-coverage ()
   "Returns an opaque representation of the current code coverage state.
@@ -40,15 +145,17 @@ The only operation that may be done on the state is passing it to
 RESTORE-COVERAGE. The representation is guaranteed to be readably printable.
 A representation that has been printed and read back will work identically
 in RESTORE-COVERAGE."
-  (loop for file being the hash-keys of sb-c::*code-coverage-info*
+  (refresh-coverage-info)
+  (loop for file being the hash-keys of (code-coverage-hashtable)
         using (hash-value states)
         collect (cons file states)))
 
 (defun restore-coverage (coverage-state)
   "Restore the code coverage data back to an earlier state produced by
 SAVE-COVERAGE."
+  ;; This does not update coverage stored in code object headers
   (loop for (file . states) in coverage-state
-        do (let ((image-states (gethash file sb-c::*code-coverage-info*))
+        do (let ((image-states (gethash file (code-coverage-hashtable)))
                  (table (make-hash-table :test 'equal)))
              (when image-states
                (loop for cons in image-states
@@ -93,6 +200,7 @@ result to RESTORE-COVERAGE."
                            :defaults pathname)))))
 
 (defun report (directory &key ((:form-mode *source-path-mode*) :whole)
+               (if-matches 'identity)
                (external-format :default))
   "Print a code coverage report of all instrumented files into DIRECTORY.
 If DIRECTORY does not exist, it will be created. The main report will be
@@ -103,28 +211,38 @@ If the keyword argument FORM-MODE has the value :CAR, the annotations in
 the coverage report will be placed on the CARs of any cons-forms, while if
 it has the value :WHOLE the whole form will be annotated (the default).
 The former mode shows explicitly which forms were instrumented, while the
-latter mode is generally easier to read."
+latter mode is generally easier to read.
+
+The keyword argument IF-MATCHES should be a designator for a function
+of one argument, called for the namestring of each file with code
+coverage info. If it returns true, the file's info is included in the
+report, otherwise ignored. The default value is CL:IDENTITY.
+"
   (let* ((paths)
          (directory (pathname-as-directory directory))
-         (*default-pathname-defaults* (translate-logical-pathname directory)))
-    (ensure-directories-exist *default-pathname-defaults*)
+         (defaults (translate-logical-pathname directory)))
+    (ensure-directories-exist defaults)
+    (when (eq if-matches 'identity)
+      (refresh-coverage-info)) ; update all
     (maphash (lambda (k v)
                (declare (ignore v))
-               (let* ((pk (translate-logical-pathname k))
-                      (n (format nil "~(~{~2,'0X~}~)"
-                                (coerce (af.contrib.sb-md5:md5sum-string
-                                         (sb-ext:native-namestring pk))
-                                        'list)))
-                      (path (make-pathname :name n :type "html" :defaults directory)))
-                 (when (probe-file k)
-                   (ensure-directories-exist pk)
-                   (with-open-file (stream path
-                                           :direction :output
-                                           :if-exists :supersede
-                                           :if-does-not-exist :create)
-                     (push (list* k n (report-file k stream external-format))
-                           paths)))))
-             *code-coverage-info*)
+               (when (funcall if-matches k)
+                 (unless (eq if-matches 'identity)
+                   (refresh-coverage-info k)) ; update one file
+                 (let* ((pk (translate-logical-pathname k))
+                        (n (format nil "~(~{~2,'0X~}~)"
+                                   (coerce (af.contrib.sb-md5:md5sum-string
+                                            (sb-ext:native-namestring pk))
+                                           'list))))
+                   (when (probe-file k)
+                     (with-open-file (stream (make-pathname :name n :type "html"
+                                                            :defaults directory)
+                                             :direction :output
+                                             :if-exists :supersede
+                                             :if-does-not-exist :create)
+                       (push (list* k n (report-file k stream external-format))
+                             paths))))))
+             (code-coverage-hashtable))
     (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
       (with-open-file (stream report-file
                               :direction :output :if-exists :supersede
@@ -178,12 +296,11 @@ latter mode is generally easier to read."
          (states (make-array (length source)
                              :initial-element 0
                              :element-type '(unsigned-byte 4)))
+         (hashtable (code-coverage-hashtable))
          ;; Convert the code coverage records to a more suitable format
          ;; for this function.
-         (expr-records (convert-records (gethash file *code-coverage-info*)
-                                        :expression))
-         (branch-records (convert-records (gethash file *code-coverage-info*)
-                                          :branch))
+         (expr-records (convert-records (gethash file hashtable) :expression))
+         (branch-records (convert-records (gethash file hashtable) :branch))
          ;; Cache the source-maps
          (maps (with-input-from-string (stream source)
                  (loop with map = nil
@@ -409,7 +526,7 @@ table.summary tr.subheading td { text-align: left; font-weight: bold; padding-le
            unless (member (caar record) '(:then :else))
            collect (list mode
                          (car record)
-                         (if (sb-c::code-coverage-record-marked record)
+                         (if (sb-c:code-coverage-record-marked record)
                              1
                              2))))
     (:branch
@@ -419,7 +536,7 @@ table.summary tr.subheading td { text-align: left; font-weight: bold; padding-le
            (when (member (car path) '(:then :else))
              (setf (gethash (cdr path) hash)
                    (logior (gethash (cdr path) hash 0)
-                           (ash (if (sb-c::code-coverage-record-marked record)
+                           (ash (if (sb-c:code-coverage-record-marked record)
                                     1
                                     2)
                                 (if (eql (car path) :then)
