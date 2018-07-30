@@ -44,6 +44,8 @@
 
 (in-package #:af.lib.coverage)
 
+(defmacro code-coverage-hashtable () `(car sb-c::*code-coverage-info*))
+
 (defun report-json (directory)
   "Print a code coverage report of all instrumented files into DIRECTORY.
 If DIRECTORY does not exist, it will be created. The main report will be
@@ -75,7 +77,7 @@ latter mode is generally easier to read."
                                            :if-does-not-exist :create)
                      (push (list* k n (af.contrib.sb-cover::report-file k stream :default))
                            paths)))))
-             *code-coverage-info*)
+             (code-coverage-hashtable))
     (let ((report-file (make-pathname :name "coverage" :type "json" :defaults directory))
           (directory-node "")
           (json (make-hash-table :test #'equal)))
@@ -163,7 +165,7 @@ latter mode is generally easier to read."
                                            :if-does-not-exist :create)
                      (push (list* k n (af.contrib.sb-cover::report-file k stream :default))
                            paths)))))
-             *code-coverage-info*)
+             (code-coverage-hashtable))
     (let ((report-file (make-pathname :name "cover-index" :type "html" :defaults directory)))
       ;;(af.contrib.sb-cover::write-styles t)
       (unless paths
