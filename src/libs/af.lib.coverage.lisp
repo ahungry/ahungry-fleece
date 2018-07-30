@@ -208,11 +208,12 @@ latter mode is generally easier to read."
   (defmacro with-coverage (package &rest body)
     "Run BODY with coverage enabled."
     `(progn
+       ;; (proclaim '(optimize af.contrib.sb-cover:store-coverage-data))
        (declaim (optimize af.contrib.sb-cover:store-coverage-data))
        (with-open-stream (*error-output* (make-broadcast-stream))
          (with-open-stream (*standard-output* (make-broadcast-stream))
            ;; (asdf:oos 'asdf:load-op ,package :force t)
-           (print "Well, this would be a load, but whatever...")
+           (asdf:load-system ,package :force t)
            ))
        ,@body
        (declaim (optimize (af.contrib.sb-cover:store-coverage-data 0)))))
