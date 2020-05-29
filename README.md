@@ -27,7 +27,7 @@ rapid development in one of the greatest languages around (Lisp!)
 ## Installation
 ### Quicklisp/REPL
 Currently the library is not on quicklisp (yet), so you'll have to add
-to your local proejcts directory after cloning it, as such:
+to your local projects directory after cloning it, as such:
 
 ```sh
 cd ~/some/path
