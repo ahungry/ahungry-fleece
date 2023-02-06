@@ -238,7 +238,7 @@ file designated by PATHNAME."
                           :if-exists :supersede
                           :if-does-not-exist :create)
     (with-standard-io-syntax
-      (let ((*package* (find-package :sb-cover)))
+      (let ((*package* (find-package :af.contrib.sb-cover)))
         (write (save-coverage) :stream stream)))
     (values)))
 
@@ -247,7 +247,7 @@ file designated by PATHNAME."
 result to RESTORE-COVERAGE."
   (with-open-file (stream pathname :direction :input)
     (with-standard-io-syntax
-      (let ((*package* (find-package :sb-cover)))
+      (let ((*package* (find-package :af.contrib.sb-cover)))
         (restore-coverage (read stream))))
     (values)))
 
@@ -296,7 +296,7 @@ report, otherwise ignored. The default value is CL:IDENTITY.
                    (refresh-coverage-info k)) ; update one file
                  (let* ((pk (translate-logical-pathname k))
                         (n (format nil "~(~{~2,'0X~}~)"
-                                   (coerce (sb-md5:md5sum-string
+                                   (coerce (af.contrib.sb-md5:md5sum-string
                                             (sb-ext:native-namestring pk))
                                            'list))))
                    (when (probe-file k)
@@ -314,7 +314,7 @@ report, otherwise ignored. The default value is CL:IDENTITY.
                               :if-does-not-exist :create)
         (write-styles stream)
         (unless paths
-          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE SB-COVER:STORE-COVERAGE-DATA))?")
+          (warn "No coverage data found for any file, producing an empty report. Maybe you~%forgot to (DECLAIM (OPTIMIZE AF.CONTRIB.SB-COVER:STORE-COVERAGE-DATA))?")
           (format stream "<h3>No code coverage data found.</h3>")
           (close stream)
           (return-from report))
