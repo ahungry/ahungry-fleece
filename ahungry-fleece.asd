@@ -38,64 +38,59 @@
   :components
   (
    ;; Contrib module from SBCL source (Public Domain)
-   (:module "af.contrib.compiler"
-            :pathname "contrib/sb-rotate-byte"
-            :components
-            ((:file "package")
-             (:file "compiler" :depends-on ("package"))))
+   ;; (:module "af.contrib.compiler"
+   ;;          :pathname "contrib/sb-rotate-byte"
+   ;;          :components
+   ;;          ((:file "package")
+   ;;           (:file "compiler" :depends-on ("package"))))
 
-   ;; Contrib module from SBCL source (Public Domain)
-   (:module "af.contrib.vm"
-            :depends-on ("af.contrib.compiler")
-            :pathname "contrib/sb-rotate-byte"
-            :components
-            ((:file "arm-vm" :if-feature :arm)
-             (:file "arm64-vm" :if-feature :arm64)
-             (:file "x86-vm" :if-feature :x86)
-             (:file "x86-64-vm" :if-feature :x86-64)
-             (:file "ppc-vm" :if-feature :ppc)))
+   ;; ;; Contrib module from SBCL source (Public Domain)
+   ;; (:module "af.contrib.vm"
+   ;;          :depends-on ("af.contrib.compiler")
+   ;;          :pathname "contrib/sb-rotate-byte"
+   ;;          :components
+   ;;          ((:file "arm-vm" :if-feature :arm)
+   ;;           (:file "arm64-vm" :if-feature :arm64)
+   ;;           (:file "x86-vm" :if-feature :x86)
+   ;;           (:file "x86-64-vm" :if-feature :x86-64)
+   ;;           (:file "ppc-vm" :if-feature :ppc)))
 
-   ;; Contrib module from SBCL source (Public Domain)
-   (:module "af.contrib.sb-rotate-byte"
-            :depends-on ("af.contrib.vm")
-            :pathname "contrib/sb-rotate-byte"
-            :components
-            ((:file "rotate-byte")))
+   ;; ;; Contrib module from SBCL source (Public Domain)
+   ;; (:module "af.contrib.sb-rotate-byte"
+   ;;          :depends-on ("af.contrib.vm")
+   ;;          :pathname "contrib/sb-rotate-byte"
+   ;;          :components
+   ;;          ((:file "rotate-byte")))
 
-   ;; Contrib module from SBCL source (Public Domain)
-   (:module "af.contrib.sb-md5"
-            :depends-on ("af.contrib.sb-rotate-byte")
-            :pathname "contrib/sb-md5"
-            :components
-            ((:file "md5")))
+   ;; ;; Contrib module from SBCL source (Public Domain)
+   ;; (:module "af.contrib.sb-md5"
+   ;;          :depends-on ("af.contrib.sb-rotate-byte")
+   ;;          :pathname "contrib/sb-md5"
+   ;;          :components
+   ;;          ((:file "md5")))
 
-   ;; Contrib module from SBCL source (Public Domain)
-   (:module "af.contrib.sb-cover"
-            :depends-on ("af.contrib.sb-md5")
-            :pathname "contrib/sb-cover"
-            :components
-            ((:file "cover")))
+   ;; ;; Contrib module from SBCL source (Public Domain)
+   ;; (:module "af.contrib.sb-cover"
+   ;;          :depends-on ("af.contrib.sb-md5")
+   ;;          :pathname "contrib/sb-cover"
+   ;;          :components
+   ;;          ((:file "cover")))
 
    ;; The lib modules
    (:module "libs"
-            :depends-on ("af.contrib.sb-cover")
-            :pathname "src/libs"
-            :components
-            ((:file "af.lib.coverage"
-                    :depends-on ("af.lib.hashy"
-                                 "af.lib.ansi-colors"
-                                 ))
-             (:file "af.lib.hashy"
-                    :depends-on ("af.lib.loggy"
-                                 "af.lib.io"))
+            ;; :depends-on ("af.contrib.sb-cover")
+    :pathname "src/libs"
+    :components
+            ((:file "af.lib.hashy"
+              :depends-on ("af.lib.loggy"
+                           "af.lib.io"))
              (:file "af.lib.testy"
-                    :depends-on ("af.lib.ansi-colors"
-                                 "af.lib.coverage"))
+              :depends-on ("af.lib.ansi-colors"))
              (:file "af.lib.loggy"
-                    :depends-on ("af.lib.io"))
+              :depends-on ("af.lib.io"))
              (:file "af.lib.ansi-colors")
              (:file "af.lib.clone"
-                    :depends-on ("af.lib.io"))
+              :depends-on ("af.lib.io"))
              (:file "af.lib.io")))
 
    ;; The main module

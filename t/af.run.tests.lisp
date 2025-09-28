@@ -24,10 +24,8 @@
         :af.lib.ansi-colors
         :af.lib.loggy
         :af.lib.hashy
-        :af.lib.coverage
         :af.lib.testy)
-  (:export :main
-           :coverage))
+  (:export :main))
 
 (in-package #:af.run.tests)
 
@@ -38,7 +36,7 @@
   "Run the tests, or the tests with coverage."
   (if (and (sb-ext:posix-getenv "AF_LIB_TESTY_COVERAGE")
            (> (length (sb-ext:posix-getenv "AF_LIB_TESTY_COVERAGE")) 0))
-      (coverage)
+      (test)
       (test)
       ))
 
@@ -149,32 +147,6 @@
        ) ;; end suite
       (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 0))))
       (setf sb-ext:*exit-hooks* (list (lambda () (sb-ext:exit :code 1)))))
-  )
-
-(defun coverage ()
-  "Begin the tests!"
-  ;; See if we're in the shell environment or not (SLIME will use 'dumb' here)
-  (af.lib.coverage:with-coverage :ahungry-fleece
-    (test)
-    (terpri)
-    (with-color :blue (format t "Summary of coverage:~%"))
-
-    (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.contrib.sb-cover:report (merge-pathnames #P"coverage/" *base-directory*)))
-
-    (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-cli (merge-pathnames #P"coverage/" *base-directory*))
-      )
-
-    (with-open-stream (*error-output* (make-broadcast-stream))
-      (af.lib.coverage:report-json (merge-pathnames #P"coverage/" *base-directory*))
-      )
-
-    (with-color :light-blue
-      (format t "~%Full coverage report generated in: ~a" (merge-pathnames #P"coverage/" *base-directory*))
-      (format t "~%Coverage summary generated in: ~acoverage.json~%~%" (merge-pathnames #P"coverage/" *base-directory*))
-      )
-    )
   )
 
 ;;; "af.run.tests" goes here. Hacks and glory await!
